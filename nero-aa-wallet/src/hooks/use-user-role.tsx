@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { fine } from "../libs/fine";
-import { Schema } from "../libs/db-types";
+
 
 export function useUserRole() {
   const { data: session } = fine.auth.useSession();

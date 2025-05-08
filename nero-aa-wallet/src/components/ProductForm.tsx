@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { useRouter } from "next/navigation";
-import { fine } from "../libs/fine";
+import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -10,6 +9,13 @@ import { Textarea } from "./ui/textarea";
 import { useToast } from "../hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import type { Schema } from "../libs/db-types";
+
+import { useSignature, useSendUserOp, useConfig } from '@/hooks';
+import { ethers } from 'ethers';
+import AgroABi from "@/constants/agrochain.json";
+import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
+import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
+import { useAccount } from "wagmi";
 
 export function ProductForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,10 +27,16 @@ export function ProductForm() {
     unit: "kg",
     imageUrl: "",
   });
+
+  const { AAaddress, isConnected } = useSignature();
+  const { execute, waitForUserOpResult } = useSendUserOp();
+  const config = useConfig();
+  const [userOpHash, setUserOpHash] = useState<string | null>('');
+  const [txStatus, setTxStatus] = useState('');
+  const [isPolling, setIsPolling] = useState(false);
   
-  const navigate = useRouter();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: session } = fine.auth.useSession();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -36,58 +48,40 @@ export function ProductForm() {
     }));
   };
 
-  // Mock blockchain transaction
-  const generateTransactionHash = () => {
-    return "0x" + Array.from({length: 64}, () => 
-      Math.floor(Math.random() * 16).toString(16)).join('');
-  };
-
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!session?.user?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to add a product",
-        variant: "destructive",
-      });
+    if (!isConnected) {
+      alert('Please connect your wallet first');
       return;
     }
-
-    // Check if user has connected a wallet
-    const users = await fine.table("users")
-      .select("walletAddress")
-      .eq("id", session.user.id);
-    
-    if (!users.length || !users[0].walletAddress) {
-      toast({
-        title: "Wallet required",
-        description: "Please connect your wallet to add products",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
+    setUserOpHash(null);
+    setTxStatus('');
+
+    
 
     try {
-      // Generate a mock transaction hash for blockchain verification
-      const transactionHash = generateTransactionHash();
-      
-      const productData: Schema["products"] = {
-        ...formData,
-        farmerId: session.user.id,
-        transactionHash,
-      };
-
-      const result = await fine.table("products").insert(productData).select();
-      
-      toast({
-        title: "Product added",
-        description: "Your product has been added and is being verified on the blockchain",
+      await execute({
+        function: 'grantRole',
+        contractAddress: contractAddressAgroChaim,
+        abi: AgroABi.abi,
+        params: [],
+        value: 0,
       });
-      
-      navigate.push("/products");
+
+      const result = await waitForUserOpResult();
+      setUserOpHash(result?.userOpHash);
+      setIsPolling(true);
+      console.log(result)
+
+      if (result.result === true) {
+        setTxStatus('Success!');
+        setIsPolling(false);
+      } else if (result.transactionHash) {
+        setTxStatus('Transaction hash: ' + result.transactionHash);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -206,7 +200,7 @@ export function ProductForm() {
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => navigate.push("/products")}
+            onClick={() => navigate("/products")}
             disabled={isLoading}
           >
             Cancel

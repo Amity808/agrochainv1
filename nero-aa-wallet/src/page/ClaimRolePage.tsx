@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Header } from "../components/layout/Header";
 import { RoleSelector } from "../components/RoleSelector";
 import { useNavigate } from "react-router-dom";
+import { useSignature, useSendUserOp, useConfig } from '@/hooks';
+import { ethers } from 'ethers';
+import AgroABi from "@/constants/agrochain.json";
+import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
+import { CONTRACT_ROLE } from "@/constants/contractRole";
+
 // import { useUserRole } from "../hooks/use-user-role";
 
 const ClaimRolePage = () => {
@@ -13,6 +19,8 @@ const ClaimRolePage = () => {
   //   navigate("/");
   //   return null;
   // }
+ 
+
   
   return (
     <main className="w-full min-h-screen flex flex-col bg-background text-foreground">

@@ -1,0 +1,7 @@
+export const CONTRACT_ROLE = {
+    FARMER_ROLE: '0x7c6181838a71a779e445600d4c6ecbe16bacf2b3c5bda69c29fada66d1b645d1',
+    CONSUMER_ROLE: '0x9d56108290ea0bc9c5c59c3ad357dca9d1b29ed7f3ae1443bef2fa2159bdf5e8',
+    MANUFACTURE_ROLE: '0xeefb95e842a3287179d933b4460be539a1d5af11aa8b325bb45c5c8dc92de4ed',
+}
+
+export const contractAddressAgroChaim = "0x69EE724Ca2F17A188af0E2De03142Dfe37972bBf"
