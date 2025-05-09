@@ -1,4 +1,4 @@
-const VITE_PINATA_JWT = process.env.VITE_PUBLIC_PINATA_JWT;
+const VITE_PINATA_JWT = import.meta.env.VITE_PINATA_JWT!;
 
 if (!VITE_PINATA_JWT) {
   throw new Error("VITE_PINATA_JWT is not defined in the environment variables.");

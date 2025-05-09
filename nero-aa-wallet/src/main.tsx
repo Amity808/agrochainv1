@@ -6,6 +6,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import Home from './page/Home'
 import ProfilePage from './page/ProfilePage'
 import ClaimRolePage from './page/ClaimRolePage'
+import AddProductPage from './page/AddProductPage'
 import '@/index.css'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
@@ -20,6 +21,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Route path="/sample" element={<Sample />}/>
     <Route path="/role" element={<ClaimRolePage />}/>
      <Route path="/profile" element={<ProfilePage />}/>
+    <Route path="/add-product" element={<AddProductPage />}/>
+
     </Routes>
     </Router>
   </SocialWallet>,

@@ -51,7 +51,7 @@ export function RoleSelector() {
       await execute({
         function: 'grantRole',
         contractAddress: contractAddressAgroChaim,
-        abi: AgroABi.abi,
+        abi: AgroABi,
         params: [CONTRACT_ROLE.FARMER_ROLE, walletAddress],
         value: 0,
       });
@@ -87,7 +87,7 @@ export function RoleSelector() {
       await execute({
         function: 'grantRole',
         contractAddress: contractAddressAgroChaim,
-        abi: AgroABi.abi,
+        abi: AgroABi,
         params: [CONTRACT_ROLE.CONSUMER_ROLE, walletAddress],
         value: 0,
       });
@@ -123,7 +123,7 @@ export function RoleSelector() {
       await execute({
         function: 'grantRole',
         contractAddress: contractAddressAgroChaim,
-        abi: AgroABi.abi,
+        abi: AgroABi,
         params: [CONTRACT_ROLE.MANUFACTURE_ROLE, walletAddress],
         value: 0,
       });

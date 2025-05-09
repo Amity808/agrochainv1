@@ -1,10 +1,10 @@
 import NEROLogoSquareIcon from './src/assets/NERO-Logo-square.svg'
-import { WEB3AUTH_NETWORK_TYPE } from '@web3auth/base'
+// import { WEB3AUTH_NETWORK_TYPE } from '@web3auth/base'
 
-// const WEB3AUTH_NETWORK_TYPE = {
-//   MAINNET: 'mainnet',
-//   TESTNET: 'testnet',
-// } as const;
+const WEB3AUTH_NETWORK_TYPE = {
+  MAINNET: 'mainnet',
+  TESTNET: 'testnet',
+} as const;
 
 const config = {
   rainbowKitProjectId: '04309ed1007e77d1f119b85205bb779d',
@@ -19,8 +19,8 @@ const config = {
       chain: {
         name: 'NERO Testnet',
         logo: NEROLogoSquareIcon,
-        networkType: 'testnet' as WEB3AUTH_NETWORK_TYPE,
-        // networkType: WEB3AUTH_NETWORK_TYPE.TESTNET,
+        // networkType: 'testnet' as WEB3AUTH_NETWORK_TYPE,
+        networkType: WEB3AUTH_NETWORK_TYPE.TESTNET,
         rpc: 'https://rpc-testnet.nerochain.io',
         chainId: 689,
         explorer: 'https://testnet.neroscan.io',
@@ -76,8 +76,8 @@ const config = {
       chain: {
         name: 'NERO Mainnet',
         logo: NEROLogoSquareIcon,
-        networkType: 'mainnet',
-        // networkType: WEB3AUTH_NETWORK_TYPE.TESTNET,
+        // networkType: 'mainnet' as WEB3AUTH_NETWORK_TYPE,
+        networkType: WEB3AUTH_NETWORK_TYPE.MAINNET,
         rpc: 'https://rpc.nerochain.io',
         chainId: 1689,
         explorer: 'https://neroscan.io',

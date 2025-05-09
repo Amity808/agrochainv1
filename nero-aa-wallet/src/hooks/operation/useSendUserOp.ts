@@ -6,8 +6,14 @@ import { useEthersSigner, useConfig, useScreenManager } from '@/hooks'
 import { OperationData, UserOperation, UserOperationResultInterface, screens } from '@/types'
 import { PAYMASTER_MODE } from '@/types/Paymaster'
 import { useBuilderWithPaymaster } from '@/utils'
+// import { ErrorDecoder } from 'ethers-decode-error'
+// import type { DecodedError } from 'ethers-decode-error'
+
+
+
 
 export const useSendUserOp = () => {
+  // const errorDecoder = ErrorDecoder.create()
   const { navigateTo, currentScreen } = useScreenManager()
   const sendUserOpContext = useContext(SendUserOpContext)
   const signer = useEthersSigner()
@@ -196,6 +202,8 @@ export const useSendUserOp = () => {
         return userOpResult
       } catch (error) {
         console.error('SendUserOp error:', error)
+        // const decodedError: DecodedError = await errorDecoder.decode(error)
+        // console.log(`Revert reason: ${decodedError.reason}`)
         throw error
       }
     },
