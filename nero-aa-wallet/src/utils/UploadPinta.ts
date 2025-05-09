@@ -5,10 +5,12 @@ export async function makeContractMetadata({
     imageFile,
     name,
     description,
+    unit
   }: {
     imageFile: File;
     name: string;
     description?: string;
+    unit?: string;
   }) {
     // upload image to Pinata
     const imageFileIpfsUrl = await pinFileWithPinata(imageFile);
@@ -18,35 +20,10 @@ export async function makeContractMetadata({
       description,
       image: imageFileIpfsUrl,
       name,
-      external_link: "https://paygramchain.com",
+      unit,
+      external_link: "https://agrochain",
       "properties": {
         "category": "payament"
-      },
-    };
-   
-    // upload token metadata json to Pinata and get ipfs uri
-    const contractMetadataJsonUri = await pinJsonWithPinata(metadataJson);
-   
-    return contractMetadataJsonUri;
-  }
-
-  export async function makeRemitanceContractMetadata({
-    name,
-    emailAddress,
-  }: {
-    
-    name: string;
-    emailAddress?: string;
-  }) {
-    // upload image to Pinata
-   
-    // build contract metadata json
-    const metadataJson = {
-      emailAddress,
-      name,
-      external_link: "https://paygramchain.com",
-      "properties": {
-        "category": "remitance"
       },
     };
    

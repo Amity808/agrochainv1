@@ -16,16 +16,17 @@ import AgroABi from "@/constants/agrochain.json";
 import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
 import { useAccount } from "wagmi";
+import { makeContractMetadata } from "@/utils/UploadPinta";
 
 export function ProductForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<Omit<Schema["products"], "id" | "farmerId" | "status" | "createdAt" | "transactionHash">>({
+  const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: 0,
     quantity: 0,
     unit: "kg",
-    imageUrl: "",
+    imageFile: null as File | null,
   });
 
   const { AAaddress, isConnected } = useSignature();
@@ -60,16 +61,25 @@ export function ProductForm() {
     setUserOpHash(null);
     setTxStatus('');
 
+    const response = await makeContractMetadata({
+      imageFile: formData.imageFile!,
+      name: formData.name,
+      description: formData.description,
+      unit: formData.unit
+    })
+
     
 
     try {
-      await execute({
-        function: 'grantRole',
+      const resultExcute = await execute({
+        function: 'addProduct',
         contractAddress: contractAddressAgroChaim,
-        abi: AgroABi.abi,
-        params: [],
+        abi: AgroABi,
+        params: [response, formData.price, formData.quantity],
         value: 0,
       });
+
+      console.log(resultExcute, "resultExcute")
 
       const result = await waitForUserOpResult();
       setUserOpHash(result?.userOpHash);
@@ -183,12 +193,15 @@ export function ProductForm() {
           <div className="space-y-2">
             <Label htmlFor="imageUrl">Image URL</Label>
             <Input
-              id="imageUrl"
-              name="imageUrl"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-              value={formData.imageUrl || ""}
-              onChange={handleChange}
+              id="imageFile"
+              name="imageFile"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setFormData((prev) => ({ ...prev, imageFile: e.target.files![0] }));
+                }
+              }}
             />
             <p className="text-xs text-muted-foreground">
               Enter a URL for your product image. Leave blank to use a default image.

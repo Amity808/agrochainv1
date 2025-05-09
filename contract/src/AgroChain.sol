@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -15,11 +15,11 @@ contract AgroChain is AccessControl {
     error ProductNotFound();
     error OrderNotFound();
     error InsufficientFunds();
-    
+    // 0x06B3cE0De6bD0eB7E565324d592b7Cab86461519
+    // 0x69EE724Ca2F17A188af0E2De03142Dfe37972bBf
 
     struct Product {
-        string name;
-        string description;
+        string url;
         uint price;
         uint quantity;
         address payable seller;
@@ -77,21 +77,20 @@ contract AgroChain is AccessControl {
 
   
 
-    function addProduct(string memory _name, string memory _description, uint _price, uint _quantity) public onlyFarmer {
+    function addProduct(string memory _URL, uint _price, uint _quantity) public onlyFarmer {
         if (_quantity == 0) {
             revert InvalidQuantity();
         }
         productCount++;
         products[productCount] = Product({
-            name: _name,
-            description: _description,
+            url: _URL,
             price: _price,
             quantity: _quantity,
             seller: payable(msg.sender),
             intermediary: address(0)
         });
 
-        emit ProductAdded(productCount, _name, msg.sender);
+        emit ProductAdded(productCount, _URL, msg.sender);
     }
 
     function grantRoleToUser(bytes32 role, address user) public onlyRole(DEFAULT_ADMIN_ROLE) {
