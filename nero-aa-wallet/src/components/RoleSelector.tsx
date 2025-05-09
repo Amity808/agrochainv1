@@ -15,7 +15,6 @@ import type { UserRole } from "../hooks/use-user-role";
 import { useSignature, useSendUserOp, useConfig } from '@/hooks';
 import { ethers } from 'ethers';
 import AgroABi from "@/constants/agrochain.json";
-import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
 import { useAccount } from "wagmi";
 
@@ -25,10 +24,7 @@ export function RoleSelector() {
   const [walletAddress, setWalletAddress] = useState<string | null>('');
 
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { data: session } = fine.auth.useSession();
-
-  const [activeTab, setActiveTab] = useState('mint-nft');
+  
   const { AAaddress, isConnected } = useSignature();
   const { execute, waitForUserOpResult } = useSendUserOp();
   const config = useConfig();
@@ -270,11 +266,11 @@ export function RoleSelector() {
             </Alert>
           )}
 
-          <RadioGroup
+          {/* <RadioGroup
             value={selectedRole || ""}
             onValueChange={(value) => handleRoleSelect(value as UserRole)}
             className="space-y-4"
-          >
+          > */}
             {roles.map((role) => (
               <div key={role.id} className="flex items-start space-x-3">
                 <RadioGroupItem value={role.id || ""} id={role.id} className="mt-1" />
@@ -303,7 +299,7 @@ export function RoleSelector() {
                 </div>
               </div>
             ))}
-          </RadioGroup>
+          {/* </RadioGroup> */}
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button

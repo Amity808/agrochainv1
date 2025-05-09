@@ -1,19 +1,8 @@
 import { Header } from "@/components/layout/Header";
 import { ProductForm } from "@/components/ProductForm";
-// import { fine } from "@/lib/fine";
-import { useNavigate } from "react-router-dom";
-import { useUserRole } from "@/hooks/use-user-role";
 
 const AddProductPage = () => {
-//   const { data: session } = fine.auth.useSession();
-  const { userRole } = useUserRole();
-  const navigate = useNavigate();
   
-  // Redirect non-farmers away from this page
-//   if (userRole && userRole !== "farmer") {
-//     navigate("/");
-//     return null;
-//   }
   
   return (
     <main className="w-full min-h-screen flex flex-col bg-background text-foreground">
