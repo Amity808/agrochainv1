@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Leaf } from "lucide-react";
-import { fine } from "../../libs/fine";
-import { UserRoleBadge } from "../UserRoleBadge";
-import { useUserRole } from "../../hooks/use-user-role";
-import { WalletConnect } from "../WalletConnect";
-import { useAccount } from "wagmi";
+// import { fine } from "../../libs/fine";
+// import { UserRoleBadge } from "../UserRoleBadge";
 
+// import { useAccount } from "wagmi";
+import { useSignature } from "@/hooks";
+import { truncateAddress } from "@/utils";
+
+//  TODO: create a hook to manage the roles selection 
 export function Header() {
-  const { data: session } = fine.auth.useSession();
-  const { userRole } = useUserRole();
-  const user = session?.user;
 
-  const { address } = useAccount();
+  // const { address } = useAccount();
+  const { AAaddress } = useSignature();
 
   return (
     <header className="border-b bg-white dark:bg-gray-950 dark:text-white">
@@ -23,49 +23,49 @@ export function Header() {
         </Link>
         
         <div className="flex items-center gap-4">
-          {user ? (
+          {AAaddress ? (
             <div className="flex items-center gap-4">
-              {userRole && <UserRoleBadge role={userRole} />}
-              <WalletConnect />
+              {/* {userRole && <UserRoleBadge role={userRole} />} */}
+              {/* <WalletConnect /> */}
               
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium hidden md:inline-block">
-                  {user.name}
+                  {truncateAddress(AAaddress)}
                 </span>
                 
-                {userRole === "farmer" && (
-                  <Link to="/products/add">
+                {/* {userRole === "farmer" && ( */}
+                  <Link to="/add-product">
                     <Button variant="outline" size="sm" className="hidden md:inline-flex">
                       Add Product
                     </Button>
                   </Link>
-                )}
+              
                 
-                {!userRole && (
+                {/* {!AAaddress && (
                   <Link to="/claim-role">
                     <Button variant="outline" size="sm">
-                      Claim Role
+                      Get Role
                     </Button>
                   </Link>
-                )}
+                )} */}
                 
-                <Link to="/profile">
+                <Link to="/product">
                   <Button variant="ghost" size="sm">Profile</Button>
                 </Link>
                 
-                <Link to="/logout">
+                {/* <Link to="/logout">
                   <Button variant="outline" size="sm">Logout</Button>
-                </Link>
+                </Link> */}
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="outline" size="sm">Login</Button>
-              </Link>
-              <Link to="/signup">
+              {/* <Link to="/login"> */}
+                <Button variant="outline" size="sm">Connect Wallet</Button>
+              {/* </Link> */}
+              {/* <Link to="/signup">
                 <Button size="sm">Sign Up</Button>
-              </Link>
+              </Link> */}
             </div>
           )}
         </div>

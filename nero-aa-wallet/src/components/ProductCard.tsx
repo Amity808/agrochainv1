@@ -1,8 +1,8 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { UserRoleBadge } from "./UserRoleBadge";
-import { TransactionStatus } from "./TransactionStatus";
+// import { UserRoleBadge } from "./UserRoleBadge";
+// import { TransactionStatus } from "./TransactionStatus";
 import { useState, useCallback, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
@@ -10,12 +10,12 @@ import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { useReadContract } from "wagmi";
 // import { ethers } from "ethers";
-import { useConfig, useSendUserOp } from "@/hooks";
+import { useConfig, useSendUserOp, useSignature } from "@/hooks";
 import { fetchIPFSData } from "@/helper/fetchIPFS";
 import { UpdatePopOver } from "./UpdatePopOver";
 import { truncateAddress } from "@/utils";
 
-
+//0x83D6d013f11D3Ce9E2d36f20813864E861151A54
 interface ProductDescription {
   description: string;
   external_link: string;
@@ -41,6 +41,7 @@ interface ProductId {
 export function ProductCard({ id }: ProductId) {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<ProductData | null>(null);
+  const [quantity, setQuantity] = useState("")
   const [txStatus, setTxStatus] = useState('');
   const [isPolling, setIsPolling] = useState(false);
   const [userOpHash, setUserOpHash] = useState<string | null>('');
@@ -50,9 +51,10 @@ export function ProductCard({ id }: ProductId) {
 
   const config = useConfig();
   const { execute, waitForUserOpResult } = useSendUserOp();
+  const { AAaddress } = useSignature()
 
 
-
+  const USDC = "0x1dA998CfaA0C044d7205A17308B20C7de1bdCf74";
 
   const { data: agroProduct } = useReadContract({
     abi: AgroABi,
@@ -120,7 +122,7 @@ export function ProductCard({ id }: ProductId) {
 
   useEffect(() => {
     formatedData();
-  },[formatedData]);
+  }, [formatedData]);
   // console.log(products?.[0]?.url, "Product url");
 
   console.log(products?.url, "Products");
@@ -134,23 +136,23 @@ export function ProductCard({ id }: ProductId) {
       // if (onPurchase) onPurchase();
       await execute({
         function: 'buyProduct',
-          contractAddress: contractAddressAgroChaim,
-          abi: AgroABi,
-          params: [id],
-          value: 0,
+        contractAddress: contractAddressAgroChaim,
+        abi: AgroABi,
+        params: [id, 1, USDC],
+        value: 0,
       })
 
       const result = await waitForUserOpResult();
-        setUserOpHash(result?.userOpHash);
-        setIsPolling(true);
-        console.log(result)
-        if (result.result === true) {
-          setTxStatus('Success!');
-          setIsPolling(false);
-        } else if (result.transactionHash) {
-          setTxStatus('Transaction hash: ' + result.transactionHash);
-        }
-          
+      setUserOpHash(result?.userOpHash);
+      setIsPolling(true);
+      console.log(result)
+      if (result.result === true) {
+        setTxStatus('Success!');
+        setIsPolling(false);
+      } else if (result.transactionHash) {
+        setTxStatus('Transaction hash: ' + result.transactionHash);
+      }
+
     } catch (error) {
       toast({
         title: "Purchase failed",
@@ -163,17 +165,48 @@ export function ProductCard({ id }: ProductId) {
   };
 
   const outOfStock = async () => {
-    
+
+    setIsLoading(true);
+    try {
+      // if (onPurchase) onPurchase();
+      await execute({
+        function: 'makeProductOutOfStock',
+        contractAddress: contractAddressAgroChaim,
+        abi: AgroABi,
+        params: [id],
+        value: 0,
+      })
+
+      const result = await waitForUserOpResult();
+      setUserOpHash(result?.userOpHash);
+      setIsPolling(true);
+      console.log(result)
+      if (result.result === true) {
+        setTxStatus('Success!');
+        setIsPolling(false);
+      } else if (result.transactionHash) {
+        setTxStatus('Transaction hash: ' + result.transactionHash);
+      }
+
+    } catch (error) {
+      toast({
+        title: "Purchase failed",
+        description: "There was an error processing.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <Card className="overflow-hidden">
-       <div className="aspect-video relative bg-muted">
+      <div className="aspect-video relative bg-muted">
         {productDetails?.image ? (
-          <img 
+          <img
             // src={productDetails?.image} 
             src={"./image.png"}
-            alt={productDetails?.name} 
+            alt={productDetails?.name}
             className="object-cover w-full h-full"
           />
         ) : (
@@ -182,13 +215,13 @@ export function ProductCard({ id }: ProductId) {
           </div>
         )}
         <div className="absolute top-2 right-2">
-          <Badge variant={products?.quantity != 0 ? "default" : "secondary"} 
-                 className={products?.quantity != 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : ""}>
+          <Badge variant={products?.quantity != 0 ? "default" : "secondary"}
+            className={products?.quantity != 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : ""}>
             {products?.quantity != 0 ? "Available" : "Sold"}
           </Badge>
         </div>
       </div>
-      
+
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <CardTitle>{productDetails?.name}</CardTitle>
@@ -199,7 +232,7 @@ export function ProductCard({ id }: ProductId) {
           {/* <UserRoleBadge role="farmer" className="text-xs" /> */}
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <p className="text-sm text-muted-foreground line-clamp-2">
           {productDetails?.description || "No description provided."}
@@ -215,36 +248,44 @@ export function ProductCard({ id }: ProductId) {
             />
           )} */}
         </div>
-      </CardContent> 
+      </CardContent>
 
       <CardFooter>
-        
-          <Button 
-            onClick={handlePurchase} 
-            disabled={isLoading} 
-            className="w-full"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              "Purchase"
-            )}
-          </Button>
-     
-        
+
+        <Button
+          onClick={handlePurchase}
+          disabled={isLoading}
+          className="w-full"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Purchase"
+          )}
+        </Button>
+
+
         {products?.quantity != 0 && (
           <Badge variant="secondary" className="w-full flex justify-center py-1">
             Sold Out
           </Badge>
         )}
 
-        <UpdatePopOver />
+        {
+          AAaddress === products?.seller && (
+            <>
+              <UpdatePopOver id={id} />
 
-        <button onClick={outOfStock}>Stock Out</button>
-       
+              <button onClick={outOfStock}>Stock Out</button>
+            </>
+          )
+        }
+
+
+
       </CardFooter>
     </Card>
   );
