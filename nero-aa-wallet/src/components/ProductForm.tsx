@@ -8,14 +8,11 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "../hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import type { Schema } from "../libs/db-types";
 
 import { useSignature, useSendUserOp, useConfig } from '@/hooks';
 import { ethers } from 'ethers';
 import AgroABi from "@/constants/agrochain.json";
-import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
-import { useAccount } from "wagmi";
 import { makeContractMetadata } from "@/utils/UploadPinta";
 
 export function ProductForm() {
@@ -61,37 +58,45 @@ export function ProductForm() {
     setUserOpHash(null);
     setTxStatus('');
 
-    const response = await makeContractMetadata({
+    
+
+    
+
+    try {
+
+      const response = await makeContractMetadata({
       imageFile: formData.imageFile!,
       name: formData.name,
       description: formData.description,
       unit: formData.unit
     })
 
-    
+    console.log(response, "response")
 
-    try {
-      const resultExcute = await execute({
-        function: 'addProduct',
-        contractAddress: contractAddressAgroChaim,
-        abi: AgroABi,
-        params: [response, formData.price, formData.quantity],
-        value: 0,
-      });
-
-      console.log(resultExcute, "resultExcute")
-
-      const result = await waitForUserOpResult();
-      setUserOpHash(result?.userOpHash);
-      setIsPolling(true);
-      console.log(result)
-
-      if (result.result === true) {
-        setTxStatus('Success!');
-        setIsPolling(false);
-      } else if (result.transactionHash) {
-        setTxStatus('Transaction hash: ' + result.transactionHash);
+      if(response) {
+        const resultExcute = await execute({
+          function: 'addProduct',
+          contractAddress: contractAddressAgroChaim,
+          abi: AgroABi,
+          params: [response, formData.price, formData.quantity],
+          value: 0,
+        });
+  
+        console.log(resultExcute, "resultExcute")
+  
+        const result = await waitForUserOpResult();
+        setUserOpHash(result?.userOpHash);
+        setIsPolling(true);
+        console.log(result)
+  
+        if (result.result === true) {
+          setTxStatus('Success!');
+          setIsPolling(false);
+        } else if (result.transactionHash) {
+          setTxStatus('Transaction hash: ' + result.transactionHash);
+        }
       }
+      
     } catch (error: any) {
       toast({
         title: "Error",

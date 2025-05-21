@@ -13,12 +13,14 @@ import { useSignature, useSendUserOp, useConfig } from '@/hooks';
 // import { ethers } from 'ethers';
 import AgroABi from "@/constants/agrochain.json";
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount } from "wagmi";
 
 
 export function RoleSelector() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [walletAddress, setWalletAddress] = useState<string | null>('');
+  const [walletAddressManu, setWalletAddressManu] = useState<string | null>('');
+  const [walletAddressConsumer, setWalletAddressConsumer] = useState<string | null>('');
 
   const navigate = useNavigate();
   
@@ -217,18 +219,15 @@ export function RoleSelector() {
               </div>
             </Alert>
           )}
-
-         
-            {roles.map((role) => (
-              <div key={role.id} className="flex items-start space-x-3">
+            <div className="flex items-start space-x-3">
                 <div className="flex flex-1 items-start space-x-3 rounded-md border p-3">
-                  <role.icon className="h-5 w-5 text-green-600" />
+                  <Sprout className="h-5 w-5 text-green-600" />
                   <div className="space-y-1">
-                    <Label htmlFor={role.id} className="text-base font-medium">
-                      {role.title}
+                    <Label  className="text-base font-medium">
+                      Farmer
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      {role.description}
+                      I grow and sell agricultural products
                     </p>
                     <input type="text" name="wallet address"
                       className="border-2 rounded-md"
@@ -238,14 +237,70 @@ export function RoleSelector() {
                       type="button"
                       variant="outline"
                       disabled={isLoading}
-                      onClick={() => role.onSelect()}
+                      className="mr-2"
+                      onClick={handleFamerRole}
                     >
                       GrantRole
                     </Button>
                   </div>
                 </div>
               </div>
-            ))}
+
+              {/* consumer role */}
+              <div className="flex items-start space-x-3">
+                <div className="flex flex-1 items-start space-x-3 rounded-md border p-3">
+                  <Sprout className="h-5 w-5 text-green-600" />
+                  <div className="space-y-1">
+                    <Label  className="text-base font-medium">
+                      Consumer
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      I purchase agricultural products for personal use
+                    </p>
+                    <input type="text" name="wallet address"
+                      className="border-2 rounded-md"
+                      placeholder="Wallet Address" value={walletAddressConsumer ?? ""}
+                      onChange={(e) => setWalletAddressConsumer(e.target.value)} id="" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isLoading}
+                      className="mr-2"
+                      onClick={handleConsumerRole}
+                    >
+                      GrantRole
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* manufacturer role */}
+              <div className="flex items-start space-x-3">
+                <div className="flex flex-1 items-start space-x-3 rounded-md border p-3">
+                  <Sprout className="h-5 w-5 text-green-600" />
+                  <div className="space-y-1">
+                    <Label  className="text-base font-medium">
+                      Manufacturer
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                    I purchase agricultural products for manufacturing
+                    </p>
+                    <input type="text" name="wallet address"
+                      className="border-2 rounded-md"
+                      placeholder="Wallet Address" value={walletAddressManu ?? ""}
+                      onChange={(e) => setWalletAddressManu(e.target.value)} id="" />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isLoading}
+                      className="mr-2"
+                      onClick={handleManufacturerRole}
+                    >
+                      GrantRole
+                    </Button>
+                  </div>
+                </div>
+              </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button

@@ -18,6 +18,7 @@ contract AgroChain is AccessControl {
     // 0x06B3cE0De6bD0eB7E565324d592b7Cab86461519
     // 0x69EE724Ca2F17A188af0E2De03142Dfe37972bBf
 
+    // TODO: should have admin addresss update the esxxcrow to be token
     struct Product {
         string url;
         uint price;
@@ -165,5 +166,49 @@ contract AgroChain is AccessControl {
         }
     }
 
+        function updateProductQuantity(uint _productId, uint _quantity) public {
+        Product storage product = products[_productId];
+        if (product.seller == address(0)) {
+            revert ProductNotFound();
+        }
+
+        // Ensure only the seller or an admin can update the quantity
+        if (product.seller != msg.sender && !hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
+            revert Unauthorized(DEFAULT_ADMIN_ROLE);
+        }
+
+        if (_quantity == 0) {
+            revert InvalidQuantity();
+        }
+
+        product.quantity = _quantity;
+    }
+
+         function makeProductOutOfStock(uint _productId) public onlyFarmer {
+        Product storage product = products[_productId];
+        if (product.seller == address(0)) {
+            revert ProductNotFound();
+        }
+
+        if (product.seller != msg.sender) {
+            revert Unauthorized(FARMER_ROLE);
+        }
+
+        product.quantity = 0;
+    }
+
+    function markOrderAsDelivered(uint _orderId) public {
+        Order storage order = orders[_orderId];
+        if (order.buyer == address(0)) {
+            revert OrderNotFound();
+        }
+
+        if (order.seller != msg.sender && !hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
+            revert Unauthorized(DEFAULT_ADMIN_ROLE);
+        }
+
+        order.status = Status.Delivered;
+        emit OrderStatusUpdated(_orderId, Status.Delivered);
+    }
 
 }

@@ -3,70 +3,154 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { UserRoleBadge } from "./UserRoleBadge";
 import { TransactionStatus } from "./TransactionStatus";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { fine } from "../libs/fine";
 import { useToast } from "../hooks/use-toast";
-import { Schema } from "../libs/db-types";
+import AgroABi from "@/constants/agrochain.json";
+import { contractAddressAgroChaim } from "@/constants/contractRole";
+import { useReadContract } from "wagmi";
+// import { ethers } from "ethers";
+import { useConfig, useSendUserOp, useSignature } from "@/hooks";
+import { fetchIPFSData } from "@/helper/fetchIPFS";
 
-type ProductWithFarmer = Schema["products"] & {
-  farmer: Schema["users"];
-};
 
-interface ProductCardProps {
-  product: ProductWithFarmer;
-  userRole?: string;
-  userId?: string;
-  onPurchase?: () => void;
+
+
+interface ProductDescription {
+  description: string;
+  external_link: string;
+  image: string;
+  name: string;
+  properties: {
+    category: string;
+    unit: string;
+  };
 }
 
-export function ProductCard({ product, userRole, userId, onPurchase }: ProductCardProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  const isFarmer = userRole === "farmer";
-  const canBuy = (userRole === "consumer" || userRole === "manufacturer") && 
-                 product.status === "available" && 
-                 product.farmerId !== userId;
+interface ProductData {
+  url: string;
+  price: number;
+  quantity: number;
+  seller: `0x${string}`;
+  intermediary: `0x${string}`;
+}
+interface ProductId {
+  id: string;
+}
 
-  // Mock blockchain transaction
-  const generateTransactionHash = () => {
-    return "0x" + Array.from({length: 64}, () => 
-      Math.floor(Math.random() * 16).toString(16)).join('');
-  };
+export function ProductCard({ id }: ProductId) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState<ProductData | null>(null);
+  const [txStatus, setTxStatus] = useState('');
+  const [isPolling, setIsPolling] = useState(false);
+  const [userOpHash, setUserOpHash] = useState<string | null>('');
+
+  const [productDetails, setProductDetails] = useState<ProductDescription | null>(null);
+  const { toast } = useToast();
+
+  const config = useConfig();
+  const { execute, waitForUserOpResult } = useSendUserOp();
+
+
+
+
+  const { data: agroProduct } = useReadContract({
+    abi: AgroABi,
+    address: contractAddressAgroChaim,
+    functionName: "products",
+    args: [id],
+  })
+
+  console.log(agroProduct, "Agrochain product");
+
+  // const fetchProducts = async () => {
+  //   try {
+  //     const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
+  //     const productContract = new ethers.Contract(contractAddressAgroChaim, AgroABi, provider);
+
+  //     const productLength = await productContract.productCount();
+  //     console.log(productLength.toString(), "Product length");
+
+  //     const productDataArray = [];
+  //     for (let i = 0; i < productLength; i++) {
+  //       const productData = await productContract.products(i);
+  //       productDataArray.push(productData);
+  //     }
+
+  //     setProducts(productDataArray);
+
+  //   } catch (error) {
+  //     console.log(error, "Error fetching products");
+  //   }
+  // }
+
+  const formatedData = useCallback(async () => {
+    if (!agroProduct || !Array.isArray(agroProduct)) {
+      console.error("agroProduct is empty or invalid:", agroProduct);
+      return;
+    }
+    if (!agroProduct) {
+      return;
+    }
+    setProducts({
+      url: agroProduct[0],
+      price: Number(agroProduct[1]),
+      quantity: Number(agroProduct[2]),
+      seller: agroProduct[3],
+      intermediary: agroProduct[4],
+    })
+  }, [agroProduct])
+
+  const fetchProjectDetails = useCallback(async () => {
+    if (!products?.url) return;
+
+    try {
+      const data = await fetchIPFSData(products?.url);
+      setProductDetails(data);
+    } catch (error) {
+      console.error('Error fetching project details:', error);
+    }
+  }, [products?.url]);
+
+  console.log(productDetails, "Product details");
+
+  useEffect(() => {
+    fetchProjectDetails();
+  }, [fetchProjectDetails]);
+
+  useEffect(() => {
+    formatedData();
+  },[]);
+  // console.log(products?.[0]?.url, "Product url");
+
+  console.log(products?.url, "Products");
+
+
 
   const handlePurchase = async () => {
-    if (!userId || !canBuy) return;
-    
+
     setIsLoading(true);
     try {
-      // Generate a mock transaction hash
-      const transactionHash = generateTransactionHash();
-      
-      // Create transaction
-      await fine.table("transactions").insert({
-        productId: product.id as number,
-        sellerId: product.farmerId,
-        buyerId: userId,
-        quantity: product.quantity,
-        totalPrice: product.price,
-        status: "completed",
-        transactionHash
-      });
-      
-      // Update product status
-      await fine.table("products")
-        .update({ 
-          status: "sold",
-          transactionHash
-        })
-        .eq("id", product.id);
-      
-      toast({
-        title: "Purchase successful",
-        description: `You have purchased ${product.name}. Transaction is being processed on the blockchain.`,
-      });
-      
-      if (onPurchase) onPurchase();
+      // if (onPurchase) onPurchase();
+      await execute({
+        function: 'buyProduct',
+          contractAddress: contractAddressAgroChaim,
+          abi: AgroABi,
+          params: [id],
+          value: 0,
+      })
+
+      const result = await waitForUserOpResult();
+        setUserOpHash(result?.userOpHash);
+        setIsPolling(true);
+        console.log(result)
+        if (result.result === true) {
+          setTxStatus('Success!');
+          setIsPolling(false);
+        } else if (result.transactionHash) {
+          setTxStatus('Transaction hash: ' + result.transactionHash);
+        }
+          
     } catch (error) {
       toast({
         title: "Purchase failed",
@@ -80,11 +164,12 @@ export function ProductCard({ product, userRole, userId, onPurchase }: ProductCa
 
   return (
     <Card className="overflow-hidden">
-      <div className="aspect-video relative bg-muted">
-        {product.imageUrl ? (
+       <div className="aspect-video relative bg-muted">
+        {productDetails?.image ? (
           <img 
-            src={product.imageUrl} 
-            alt={product.name} 
+            // src={productDetails?.image} 
+            src={"./image.png"}
+            alt={productDetails?.name} 
             className="object-cover w-full h-full"
           />
         ) : (
@@ -93,43 +178,43 @@ export function ProductCard({ product, userRole, userId, onPurchase }: ProductCa
           </div>
         )}
         <div className="absolute top-2 right-2">
-          <Badge variant={product.status === "available" ? "default" : "secondary"} 
-                 className={product.status === "available" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : ""}>
-            {product.status === "available" ? "Available" : "Sold"}
+          <Badge variant={products?.quantity != 0 ? "default" : "secondary"} 
+                 className={products?.quantity != 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : ""}>
+            {products?.quantity != 0 ? "Available" : "Sold"}
           </Badge>
         </div>
       </div>
       
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle>{product.name}</CardTitle>
-          <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+          <CardTitle>{productDetails?.name}</CardTitle>
+          <span className="text-lg font-bold">${products?.price}</span>
         </div>
-        <CardDescription className="flex items-center gap-2">
+        {/* <CardDescription className="flex items-center gap-2">
           <span>by {product.farmer?.name || "Unknown Farmer"}</span>
           <UserRoleBadge role="farmer" className="text-xs" />
-        </CardDescription>
+        </CardDescription> */}
       </CardHeader>
       
       <CardContent>
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {product.description || "No description provided."}
+          {productDetails?.description || "No description provided."}
         </p>
         <div className="mt-2 flex items-center gap-2">
           <Badge variant="outline" className="bg-muted/50">
-            {product.quantity} {product.unit}
+            {products?.quantity} {productDetails?.properties?.unit}
           </Badge>
-          {product.transactionHash && (
+          {/* {product.transactionHash && (
             <TransactionStatus 
               transactionHash={product.transactionHash} 
               status={product.status}
             />
-          )}
+          )} */}
         </div>
-      </CardContent>
-      
+      </CardContent> 
+
       <CardFooter>
-        {canBuy && (
+        {/* {canBuy && ( */}
           <Button 
             onClick={handlePurchase} 
             disabled={isLoading} 
@@ -144,13 +229,9 @@ export function ProductCard({ product, userRole, userId, onPurchase }: ProductCa
               "Purchase"
             )}
           </Button>
-        )}
-        {isFarmer && product.farmerId === userId && (
-          <Badge variant="outline" className="w-full flex justify-center py-1">
-            Your Product
-          </Badge>
-        )}
-        {product.status === "sold" && (
+        {/* )} */}
+        
+        {products?.quantity != 0 && (
           <Badge variant="secondary" className="w-full flex justify-center py-1">
             Sold Out
           </Badge>

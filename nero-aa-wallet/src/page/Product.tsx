@@ -1,76 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Header } from "@/components/layout/Header";
-import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
-import { Loader2, Plus } from "lucide-react";
-import { fine } from "@/libs/fine";
+import { Plus } from "lucide-react";
 import { Schema } from "@/libs/db-types";
-import { useToast } from "@/hooks/use-toast";
-
+import Products from "@/components/Products";
 import { useUserRole } from "@/hooks/use-user-role";
 
-type ProductWithFarmer = Schema["products"] & {
-  farmer: Schema["users"];
-};
+
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState<ProductWithFarmer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-  const { toast } = useToast();
-  const { data: session } = fine.auth.useSession();
+ 
   const { userRole } = useUserRole();
-  const user = session?.user;
-  
-  const fetchProducts = async () => {
-    setIsLoading(true);
-    try {
-      const fetchedProducts = await fine.table("products")
-        .select("*, farmer:users(id, name, email, role)");
-      
-      setProducts(fetchedProducts as unknown as ProductWithFarmer[]);
-    } catch (error) {
-      toast({
-        title: "Failed to load products",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-  
-  const handleProductPurchase = () => {
-    fetchProducts();
-  };
-  
-  const filteredProducts = products
-    .filter(product => 
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "newest":
-          return (b.createdAt || 0) - (a.createdAt || 0);
-        case "oldest":
-          return (a.createdAt || 0) - (b.createdAt || 0);
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        default:
-          return 0;
-      }
-    });
   
   return (
     <main className="w-full min-h-screen flex flex-col bg-background text-foreground">
@@ -120,27 +66,8 @@ const ProductsPage = () => {
           </div>
         </div>
         
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No products found.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                userRole={userRole || undefined}
-                userId={user?.id}
-                onPurchase={handleProductPurchase}
-              />
-            ))}
-          </div>
-        )}
+        
+        <Products />
       </div>
       
       <footer className="border-t py-6">

@@ -5,6 +5,9 @@ if (!VITE_PINATA_JWT) {
 }
 
 export async function pinFileWithPinata(file: File) {
+  if(!file) {
+    throw new Error("File is required")
+  }
   const data = new FormData();
   data.append("file", file);
 
