@@ -10,10 +10,10 @@ import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { useReadContract } from "wagmi";
 // import { ethers } from "ethers";
-import { useConfig, useSendUserOp, useSignature } from "@/hooks";
+import { useConfig, useSendUserOp } from "@/hooks";
 import { fetchIPFSData } from "@/helper/fetchIPFS";
-
-
+import { UpdatePopOver } from "./UpdatePopOver";
+import { truncateAddress } from "@/utils";
 
 
 interface ProductDescription {
@@ -120,7 +120,7 @@ export function ProductCard({ id }: ProductId) {
 
   useEffect(() => {
     formatedData();
-  },[]);
+  },[formatedData]);
   // console.log(products?.[0]?.url, "Product url");
 
   console.log(products?.url, "Products");
@@ -162,6 +162,10 @@ export function ProductCard({ id }: ProductId) {
     }
   };
 
+  const outOfStock = async () => {
+    
+  }
+
   return (
     <Card className="overflow-hidden">
        <div className="aspect-video relative bg-muted">
@@ -190,10 +194,10 @@ export function ProductCard({ id }: ProductId) {
           <CardTitle>{productDetails?.name}</CardTitle>
           <span className="text-lg font-bold">${products?.price}</span>
         </div>
-        {/* <CardDescription className="flex items-center gap-2">
-          <span>by {product.farmer?.name || "Unknown Farmer"}</span>
-          <UserRoleBadge role="farmer" className="text-xs" />
-        </CardDescription> */}
+        <CardDescription className="flex items-center gap-2">
+          <span>by {truncateAddress(products?.seller || "") || "Unknown Farmer"}</span>
+          {/* <UserRoleBadge role="farmer" className="text-xs" /> */}
+        </CardDescription>
       </CardHeader>
       
       <CardContent>
@@ -214,7 +218,7 @@ export function ProductCard({ id }: ProductId) {
       </CardContent> 
 
       <CardFooter>
-        {/* {canBuy && ( */}
+        
           <Button 
             onClick={handlePurchase} 
             disabled={isLoading} 
@@ -229,13 +233,18 @@ export function ProductCard({ id }: ProductId) {
               "Purchase"
             )}
           </Button>
-        {/* )} */}
+     
         
         {products?.quantity != 0 && (
           <Badge variant="secondary" className="w-full flex justify-center py-1">
             Sold Out
           </Badge>
         )}
+
+        <UpdatePopOver />
+
+        <button onClick={outOfStock}>Stock Out</button>
+       
       </CardFooter>
     </Card>
   );

@@ -2,8 +2,10 @@
 pragma solidity ^0.8.20;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract AgroChain is AccessControl {
+    IERC20 public paymentToken;
 
     bytes32 public constant FARMER_ROLE = keccak256("FARMER_ROLE");
     bytes32 public constant CONSUMER_ROLE = keccak256("CONSUMER_ROLE");
@@ -36,16 +38,36 @@ contract AgroChain is AccessControl {
         Status status;
     }
 
-    enum Status { Pending, Shipped, Delivered, Completed, Disputed }
+    enum Status {
+        Pending,
+        Shipped,
+        Delivered,
+        Completed,
+        Disputed
+    }
 
     uint public productCount;
     uint public orderCount;
+    mapping(address => bool) public supportedTokens;
     mapping(uint => Product) public products;
+    mapping(uint => uint) public escrowBalances;
     mapping(uint => Order) public orders;
 
     event ProductAdded(uint productId, string name, address seller);
     event OrderPlaced(uint orderId, uint productId, address buyer);
     event OrderStatusUpdated(uint orderId, Status status);
+    event TokenSupported(address token, bool isSupported);
+
+
+    struct Review {
+        uint orderId;
+        uint rating;
+        string comment;
+    }
+
+    mapping(uint => Review) public reviews;
+
+    event ReviewAdded(uint orderId, uint rating, string comment);
 
     constructor() {
         _setRoleAdmin(FARMER_ROLE, DEFAULT_ADMIN_ROLE);
@@ -76,9 +98,11 @@ contract AgroChain is AccessControl {
         _;
     }
 
-  
-
-    function addProduct(string memory _URL, uint _price, uint _quantity) public onlyFarmer {
+    function addProduct(
+        string memory _URL,
+        uint _price,
+        uint _quantity
+    ) public onlyFarmer {
         if (_quantity == 0) {
             revert InvalidQuantity();
         }
@@ -94,56 +118,66 @@ contract AgroChain is AccessControl {
         emit ProductAdded(productCount, _URL, msg.sender);
     }
 
-    function grantRoleToUser(bytes32 role, address user) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function grantRoleToUser(
+        bytes32 role,
+        address user
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         grantRole(role, user);
     }
 
-    function revokeRoleFromUser(bytes32 role, address user) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function revokeRoleFromUser(
+        bytes32 role,
+        address user
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         revokeRole(role, user);
     }
 
- 
-    function calculateIntermediaryFee(uint amount, bytes32 buyerRole) internal pure returns (uint) {
+    function calculateIntermediaryFee(
+        uint amount,
+        bytes32 buyerRole
+    ) internal pure returns (uint) {
         if (buyerRole == CONSUMER_ROLE) {
-            return amount * 5 / 100; 
+            return (amount * 5) / 100;
         } else if (buyerRole == MANUFACTURER_ROLE) {
-            return amount * 10 / 100; 
+            return (amount * 10) / 100;
         } else {
             return 0;
         }
     }
 
- 
+    function buyProduct(
+        uint _productId,
+        uint _quantity,
+        address _tokenAddress // Add token address as a parameter
+    ) public  {
+        require(supportedTokens[_tokenAddress], "Token not supported");
 
-    function buyProduct(uint _productId, uint _quantity) public payable onlyConsumer {
         Product storage product = products[_productId];
         if (product.seller == address(0)) {
             revert ProductNotFound();
         }
-
         if (product.quantity < _quantity) {
             revert InvalidQuantity();
         }
 
         uint totalPrice = product.price * _quantity;
-
         uint intermediaryFee = 0;
         if (product.intermediary != address(0)) {
             intermediaryFee = calculateIntermediaryFee(totalPrice, CONSUMER_ROLE);
         }
-
         uint amountToBePaid = totalPrice + intermediaryFee;
 
-        if (msg.value < amountToBePaid) {
-            revert InsufficientFunds();
-        }
-
-        (bool success, ) = product.seller.call{value: totalPrice}("");
-        require(success, "Transfer to seller failed");
+        IERC20 token = IERC20(_tokenAddress);
+        require(
+            token.transferFrom(msg.sender, address(this), amountToBePaid),
+            "Token transfer failed"
+        );
 
         if (product.intermediary != address(0)) {
-            (success, ) = product.intermediary.call{value: intermediaryFee}("");
-            require(success, "Transfer to intermediary failed");
+            require(
+                token.transfer(product.intermediary, intermediaryFee),
+                "Intermediary transfer failed"
+            );
         }
 
         product.quantity -= _quantity;
@@ -159,21 +193,44 @@ contract AgroChain is AccessControl {
         });
 
         emit OrderPlaced(orderCount, _productId, msg.sender);
-
-        if (msg.value > amountToBePaid) {
-            (success, ) = msg.sender.call{value: msg.value - amountToBePaid}("");
-            require(success, "Refund failed");
-        }
     }
 
-        function updateProductQuantity(uint _productId, uint _quantity) public {
+    function releaseEscrow(
+    uint _orderId,
+    address _tokenAddress
+) public {
+    Order storage order = orders[_orderId];
+    if (order.status != Status.Delivered) {
+        revert("Order not delivered");
+    }
+
+    // Ensure only the farmer (seller) can release escrow
+    if (order.seller != msg.sender) {
+        revert Unauthorized(FARMER_ROLE);
+    }
+
+    uint totalPrice = products[order.productId].price * order.quantity;
+
+    IERC20 token = IERC20(_tokenAddress);
+    require(
+        token.transfer(order.seller, totalPrice),
+        "Token transfer to seller failed"
+    );
+
+    escrowBalances[order.productId] -= totalPrice;
+}
+
+    function updateProductQuantity(uint _productId, uint _quantity) public {
         Product storage product = products[_productId];
         if (product.seller == address(0)) {
             revert ProductNotFound();
         }
 
         // Ensure only the seller or an admin can update the quantity
-        if (product.seller != msg.sender && !hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
+        if (
+            product.seller != msg.sender &&
+            !hasRole(DEFAULT_ADMIN_ROLE, msg.sender)
+        ) {
             revert Unauthorized(DEFAULT_ADMIN_ROLE);
         }
 
@@ -184,7 +241,7 @@ contract AgroChain is AccessControl {
         product.quantity = _quantity;
     }
 
-         function makeProductOutOfStock(uint _productId) public onlyFarmer {
+    function makeProductOutOfStock(uint _productId) public onlyFarmer {
         Product storage product = products[_productId];
         if (product.seller == address(0)) {
             revert ProductNotFound();
@@ -203,7 +260,10 @@ contract AgroChain is AccessControl {
             revert OrderNotFound();
         }
 
-        if (order.seller != msg.sender && !hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
+        if (
+            order.seller != msg.sender &&
+            !hasRole(DEFAULT_ADMIN_ROLE, msg.sender)
+        ) {
             revert Unauthorized(DEFAULT_ADMIN_ROLE);
         }
 
@@ -211,4 +271,29 @@ contract AgroChain is AccessControl {
         emit OrderStatusUpdated(_orderId, Status.Delivered);
     }
 
+    function addReview(
+        uint _orderId,
+        uint _rating,
+        string memory _comment
+    ) public {
+        Order storage order = orders[_orderId];
+        if (order.buyer != msg.sender) {
+            revert Unauthorized(CONSUMER_ROLE);
+        }
+        if (order.status != Status.Completed) {
+            revert("Order not completed");
+        }
+        reviews[_orderId] = Review({
+            orderId: _orderId,
+            rating: _rating,
+            comment: _comment
+        });
+        emit ReviewAdded(_orderId, _rating, _comment);
+    }
+
+    function setSupportedToken(address _token, bool _isSupported) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        supportedTokens[_token] = _isSupported;
+        emit TokenSupported(_token, _isSupported);
+    }
+    
 }

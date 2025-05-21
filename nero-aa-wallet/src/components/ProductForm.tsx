@@ -10,9 +10,9 @@ import { useToast } from "../hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
 import { useSignature, useSendUserOp, useConfig } from '@/hooks';
-import { ethers } from 'ethers';
+// import { ethers } from 'ethers';
 import AgroABi from "@/constants/agrochain.json";
-import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
+import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { makeContractMetadata } from "@/utils/UploadPinta";
 
 export function ProductForm() {
