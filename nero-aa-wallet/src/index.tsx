@@ -20,6 +20,8 @@ import {
 import { useSignature, useAAtransfer, useSendUserOp, useConfig } from '@/hooks'
 import '@rainbow-me/rainbowkit/styles.css'
 import '@/index.css'
+// import { Web3AuthProvider } from "@web3auth/modal/react";
+// import web3AuthContextConfig from './contexts/Web3AuthContext'
 import { WalletConfig } from '@/types'
 
 interface SocialWalletProps {
@@ -38,6 +40,7 @@ export const SocialWallet: React.FC<SocialWalletProps> = ({
   const queryClient = new QueryClient()
 
   return (
+    // <Web3AuthProvider config={web3AuthContextConfig}>
     <ConfigProvider config={config}>
       <WrapWagmiProvider>
         <QueryClientProvider client={queryClient}>
@@ -70,6 +73,7 @@ export const SocialWallet: React.FC<SocialWalletProps> = ({
         </QueryClientProvider>
       </WrapWagmiProvider>
     </ConfigProvider>
+    // </Web3AuthProvider>
   )
 }
 

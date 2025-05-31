@@ -3,6 +3,7 @@ import { CustomConnectButton } from '@/components/features/connect'
 import { SendUserOpContext } from '@/contexts'
 import { useScreenManager } from '@/hooks'
 import ScreenRenderer from '@/routes/ScreenRenderer'
+// import Web3AuthCustomWallet from './components/features/Web3Auth'
 
 interface AppProps {
   mode?: 'sidebar' | 'button'

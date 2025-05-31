@@ -4,6 +4,7 @@ import NEROLogoSquareIcon from './src/assets/NERO-Logo-square.svg'
 const WEB3AUTH_NETWORK_TYPE = {
   MAINNET: 'mainnet',
   TESTNET: 'testnet',
+  SAPPHIRE_DEVNET:'sapphire_devnet'
 } as const;
 
 const config = {
@@ -20,7 +21,7 @@ const config = {
         name: 'NERO Testnet',
         logo: NEROLogoSquareIcon,
         // networkType: 'testnet' as WEB3AUTH_NETWORK_TYPE,
-        networkType: WEB3AUTH_NETWORK_TYPE.TESTNET,
+        networkType: WEB3AUTH_NETWORK_TYPE.SAPPHIRE_DEVNET,
         rpc: 'https://rpc-testnet.nerochain.io',
         chainId: 689,
         explorer: 'https://testnet.neroscan.io',

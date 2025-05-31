@@ -119,29 +119,8 @@ export function Dashboard({ userRole, userId }: DashboardProps) {
                   </Button>
                 </Link>
               </div>
+              {/* Get product related to farmer */}
               
-              {products.length === 0 ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-8">
-                    <ShoppingBag className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground text-center">You haven't listed any products yet.</p>
-                    <Link to="/products/add" className="mt-4">
-                      <Button>Add Your First Product</Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {products.map((product) => (
-                    <ProductCard 
-                      key={product.id} 
-                      product={product} 
-                      userRole={userRole}
-                      userId={userId}
-                    />
-                  ))}
-                </div>
-              )}
             </TabsContent>
             
             <TabsContent value="sales">
@@ -220,29 +199,8 @@ export function Dashboard({ userRole, userId }: DashboardProps) {
             </TabsList>
             <TabsContent value="marketplace" className="space-y-4">
               <h3 className="text-lg font-medium">Available Products</h3>
+              {/* case of consumer */}
               
-              {products.filter(p => p.status === "available").length === 0 ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-8">
-                    <ShoppingBag className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground text-center">No products available at the moment.</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {products
-                    .filter(p => p.status === "available")
-                    .map((product) => (
-                      <ProductCard 
-                        key={product.id} 
-                        product={product} 
-                        userRole={userRole}
-                        userId={userId}
-                        onPurchase={handleProductPurchase}
-                      />
-                    ))}
-                </div>
-              )}
             </TabsContent>
             
             <TabsContent value="purchases">
