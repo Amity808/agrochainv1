@@ -8,7 +8,6 @@ import { Loader2, Plus, ShoppingBag, Truck, BarChart3 } from "lucide-react";
 import { fine } from "../libs/fine";
 import { Schema } from "../libs/db-types";
 import { useToast } from "../hooks/use-toast";
-import { useUserRole } from "../hooks/use-user-role";
 import { TransactionStatus } from "./TransactionStatus";
 
 type ProductWithFarmer = Schema["products"] & {

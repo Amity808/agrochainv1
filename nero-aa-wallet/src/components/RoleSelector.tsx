@@ -14,7 +14,11 @@ import { useSignature, useSendUserOp, useConfig } from '@/hooks';
 import AgroABi from "@/constants/agrochain.json";
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
 import { useAccount } from "wagmi";
-
+import { getWallet } from "@/utils/getWallet";
+import { ethers } from "ethers";
+// import { toast } from "@/hooks/use-toast";
+import { useRoles } from "@/hooks/useRole";
+import { useToast } from "@/hooks/use-toast";
 
 export function RoleSelector() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -23,15 +27,28 @@ export function RoleSelector() {
   const [walletAddressConsumer, setWalletAddressConsumer] = useState<string | null>('');
 
   const navigate = useNavigate();
+
+  const {isFarmerRole, isConsumerRole, isManufactureRole} = useRoles(walletAddress ?? ''); // Fetch roles for the given wallet address
   
   const { AAaddress, isConnected } = useSignature();
-  const { execute, waitForUserOpResult } = useSendUserOp();
   const config = useConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [userOpHash, setUserOpHash] = useState<string | null>('');
   const [txStatus, setTxStatus] = useState('');
   const [isPolling, setIsPolling] = useState(false);
   const {address }  = useAccount()
+
+  const { toast } = useToast();
+
+  const wallet = getWallet(import.meta.env.VITE_SIGN_URL);
+
+  const contractWasteInsured = new ethers.Contract(
+    contractAddressAgroChaim,
+    AgroABi, 
+    wallet
+    // signer
+  );
+
 
 
 
@@ -40,32 +57,31 @@ export function RoleSelector() {
       alert('Please connect your wallet first');
       return;
     }
+
+    if(!isFarmerRole) {
+      alert('You already have a Farmer role');
+      return;
+    }
     setIsLoading(true);
-    setUserOpHash(null);
-    setTxStatus('');
+    
 
     try {
-      await execute({
-        function: 'grantRole',
-        contractAddress: contractAddressAgroChaim,
-        abi: AgroABi,
-        params: [CONTRACT_ROLE.FARMER_ROLE, walletAddress],
-        value: 0,
-      });
-
-      const result = await waitForUserOpResult();
-      setUserOpHash(result?.userOpHash);
-      setIsPolling(true);
-
-      if (result.result === true) {
-        setTxStatus('Success!');
-        setIsPolling(false);
-      } else if (result.transactionHash) {
-        setTxStatus('Transaction hash: ' + result.transactionHash);
-      }
+      const getRole = await contractWasteInsured.grantRole(
+        CONTRACT_ROLE.FARMER_ROLE, 
+        AAaddress);
+      console.log(getRole, "getRole");
+      toast({
+        title: "Success",
+        description: `You are now registered as a Farmer on the Agrochain`,
+        
+      })
     } catch (error) {
       console.error('Error:', error);
-      setTxStatus('An error occurred');
+      toast({
+        title: "Error",
+        description: "Failed to get role.",
+        variant: "destructive", // Use "destructive" for errors
+      });
     } finally {
       setIsLoading(false);
     }
@@ -76,32 +92,32 @@ export function RoleSelector() {
       alert('Please connect your wallet first');
       return;
     }
+
+    if(!isConsumerRole) {
+      alert('You already have a Consumer role');
+      return;
+    }
     setIsLoading(true);
-    setUserOpHash(null);
-    setTxStatus('');
+    
 
-    try {
-      await execute({
-        function: 'grantRole',
-        contractAddress: contractAddressAgroChaim,
-        abi: AgroABi,
-        params: [CONTRACT_ROLE.CONSUMER_ROLE, walletAddress],
-        value: 0,
-      });
+    try {     
 
-      const result = await waitForUserOpResult();
-      setUserOpHash(result?.userOpHash);
-      setIsPolling(true);
-
-      if (result.result === true) {
-        setTxStatus('Success!');
-        setIsPolling(false);
-      } else if (result.transactionHash) {
-        setTxStatus('Transaction hash: ' + result.transactionHash);
-      }
+      const getRole = await contractWasteInsured.grantRole(
+        CONTRACT_ROLE.CONSUMER_ROLE, 
+        AAaddress);
+      console.log(getRole, "getRole");
+      toast({
+        title: "Success",
+        description: `You are now registered as a Farmer on the Agrochain`,
+        
+      })
     } catch (error) {
       console.error('Error:', error);
-      setTxStatus('An error occurred');
+      toast({
+        title: "Error",
+        description: "Failed to select role.",
+        variant: "destructive", 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -112,60 +128,37 @@ export function RoleSelector() {
       alert('Please connect your wallet first');
       return;
     }
+    if(!isManufactureRole) {
+      alert('You already have a Manufacturer role');
+      return;
+    }
     setIsLoading(true);
-    setUserOpHash(null);
-    setTxStatus('');
 
     try {
-      await execute({
-        function: 'grantRole',
-        contractAddress: contractAddressAgroChaim,
-        abi: AgroABi,
-        params: [CONTRACT_ROLE.MANUFACTURE_ROLE, walletAddress],
-        value: 0,
-      });
 
-      const result = await waitForUserOpResult();
-      setUserOpHash(result?.userOpHash);
-      setIsPolling(true);
-
-      // if (result.result === true) {
-        setTxStatus('Success!');
-        setIsPolling(false);
-      // } else if (result.transactionHash) {
-        setTxStatus('Transaction hash: ' + result.transactionHash);
-      // }
+      const getRole = await contractWasteInsured.grantRole(
+        CONTRACT_ROLE.CONSUMER_ROLE, 
+        AAaddress);
+      console.log(getRole, "getRole");
+      toast({
+        title: "Success",
+        description: `You are now registered as a Farmer on the Agrochain`,
+        
+      })
+      
     } catch (error) {
       console.error('Error:', error);
-      setTxStatus('An error occurred');
+      toast({
+        title: "Error",
+        description: "Failed to select role.",
+        variant: "destructive", 
+      });
     } finally {
       setIsLoading(false);
     }
   }
 
-  const roles = [
-    {
-      id: "farmer" as UserRole,
-      title: "Farmer",
-      description: "I grow and sell agricultural products",
-      icon: Sprout,
-      onSelect: handleFamerRole,
-    },
-    {
-      id: "consumer" as UserRole,
-      title: "Consumer",
-      description: "I purchase agricultural products for personal use",
-      icon: ShoppingCart,
-      onSelect: handleConsumerRole,
-    },
-    {
-      id: "manufacturer" as UserRole,
-      title: "Manufacturer",
-      description: "I purchase agricultural products for manufacturing",
-      icon: Factory,
-      onSelect: handleManufacturerRole,
-    },
-  ];
+  
 
 
 
@@ -200,22 +193,16 @@ export function RoleSelector() {
       </CardHeader>
       <form >
         <CardContent className="space-y-4">
-          {!walletAddress && (
+          {!AAaddress && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Wallet Required</AlertTitle>
               <AlertDescription>
                 You need to connect your blockchain wallet before claiming a role.
-                Please contact the admin to get from or fill this form coming soon.
+                Please click on the any role you are looking forward to get.
               </AlertDescription>
               <div className="mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/profile")}
-                >
-                  Go to Profile
-                </Button>
+                
               </div>
             </Alert>
           )}
@@ -229,10 +216,7 @@ export function RoleSelector() {
                     <p className="text-sm text-muted-foreground">
                       I grow and sell agricultural products
                     </p>
-                    <input type="text" name="wallet address"
-                      className="border-2 rounded-md"
-                      placeholder="Wallet Address" value={walletAddress ?? ""}
-                      onChange={(e) => setWalletAddress(e.target.value)} id="" />
+                    
                     <Button
                       type="button"
                       variant="outline"
@@ -257,10 +241,7 @@ export function RoleSelector() {
                     <p className="text-sm text-muted-foreground">
                       I purchase agricultural products for personal use
                     </p>
-                    <input type="text" name="wallet address"
-                      className="border-2 rounded-md"
-                      placeholder="Wallet Address" value={walletAddressConsumer ?? ""}
-                      onChange={(e) => setWalletAddressConsumer(e.target.value)} id="" />
+                    
                     <Button
                       type="button"
                       variant="outline"
@@ -285,10 +266,7 @@ export function RoleSelector() {
                     <p className="text-sm text-muted-foreground">
                     I purchase agricultural products for manufacturing
                     </p>
-                    <input type="text" name="wallet address"
-                      className="border-2 rounded-md"
-                      placeholder="Wallet Address" value={walletAddressManu ?? ""}
-                      onChange={(e) => setWalletAddressManu(e.target.value)} id="" />
+                    
                     <Button
                       type="button"
                       variant="outline"
