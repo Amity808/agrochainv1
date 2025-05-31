@@ -1,7 +1,12 @@
 export default {
-  // ... existing config ...
+  // ... your existing config
   onwarn(warning, warn) {
-    if (warning.code === "PURE_COMMENT") return; // Ignore PURE_COMMENT warnings
-    warn(warning);
-  },
+    if (
+      warning.code === 'PLUGIN_WARNING' && 
+      warning.message.includes('contains an annotation that Rollup cannot interpret')
+    ) {
+      return; // Ignore pure-comment warnings
+    }
+    warn(warning); // Preserve other warnings
+  }
 };
