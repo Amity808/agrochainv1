@@ -7,7 +7,11 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 const commonConfig = {
-  plugins: [react(), tsconfigPaths(), nodePolyfills()],
+  plugins: [react(), tsconfigPaths(), nodePolyfills(
+    {
+      include: ['buffer']
+    }
+  )],
   css: {
     postcss: {
       plugins: [tailwindcss(), autoprefixer()],

@@ -1,3 +1,6 @@
+import { Buffer } from 'buffer';
+window.Buffer = Buffer; // Make `Buffer` globally available
+
 import ReactDOM from 'react-dom/client'
 import Sample from './Sample'
 import neroConfig from '../nerowallet.config'
