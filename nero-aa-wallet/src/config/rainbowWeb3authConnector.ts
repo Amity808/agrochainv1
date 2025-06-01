@@ -98,13 +98,13 @@ export const rainbowWeb3AuthConnector = ({
           loginConfig: {
             google: {
               name: walletConfig.loginConfig.google.name,
-              verifier: walletConfig.loginConfig.google.verifier,
+              verifier: "agrochain",
               typeOfLogin: 'google', // Pass on the login provider of the verifier you've created
               clientId: walletConfig.loginConfig.google.clientId, // Pass on the Google `Client ID` here'
             },
             facebook: {
               name: walletConfig.loginConfig.facebook.name,
-              verifier: walletConfig.loginConfig.facebook.verifier, // Pass the Verifier name here
+              verifier: "agrochain-face", // Pass the Verifier name here
               typeOfLogin: 'facebook', // Pass on the login provider of the verifier you've created
               clientId: walletConfig.loginConfig.facebook.clientId, // Pass on the Google `Client ID` here
             },

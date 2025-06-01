@@ -12,6 +12,9 @@ const Home = () => {
   const { userRole, isLoading: isRoleLoading } = useUserRole();
   const user = session?.user;
 
+  console.log('Using redirect URI:', 
+    window.location.origin + '/auth/google/callback');
+
   if (isPending || isRoleLoading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center">

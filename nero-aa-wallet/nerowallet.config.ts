@@ -20,7 +20,7 @@ const config = {
       chain: {
         name: 'NERO Testnet',
         logo: NEROLogoSquareIcon,
-        // networkType: 'testnet' as WEB3AUTH_NETWORK_TYPE,
+        // networkType: WEB3AUTH_NETWORK_TYPE.TESTNET,
         networkType: WEB3AUTH_NETWORK_TYPE.SAPPHIRE_DEVNET,
         rpc: 'https://rpc-testnet.nerochain.io',
         chainId: 689,
@@ -63,12 +63,14 @@ const config = {
             verifier: 'NeroTest-Google-Maintest',
             typeOfLogin: 'google',
             clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            redirectUrl: window.location.origin,
           },
           facebook: {
             name: 'facebook',
             verifier: 'NeroTest-Facebook-Maintest',
             typeOfLogin: 'facebook',
             clientId: import.meta.env.VITE_FACEBOOK_CLIENT_ID,
+            
           },
         },
       },
