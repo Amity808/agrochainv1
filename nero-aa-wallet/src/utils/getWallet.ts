@@ -6,6 +6,7 @@ export const getWallet = (privateKey?: string) => {
     const provider = new ethers.providers.JsonRpcProvider(localRpcUrl);
 
     const signURL = import.meta.env.VITE_SIGN_URL;
+    
     // Initialize wallet
     const wallet = new ethers.Wallet(
         privateKey ?? signURL!,
