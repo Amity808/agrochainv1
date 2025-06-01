@@ -21,7 +21,7 @@ const commonConfig = {
     },
   },
   define: {
-    
+
     'process.env': {},
     global: 'globalThis',
   },
@@ -44,6 +44,7 @@ export default defineConfig(({ mode }) => {
             entryFileNames: 'bundle.js',
           },
         },
+        copyPublicDir: true,
       },
     }
   }
@@ -72,6 +73,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      copyPublicDir: true,
     },
   }
 })
