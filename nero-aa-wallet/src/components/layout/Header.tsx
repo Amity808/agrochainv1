@@ -50,7 +50,7 @@ export function Header() {
                 )} */}
                 
                 <Link to="/product">
-                  <Button variant="ghost" size="sm">Profile</Button>
+                  <Button variant="ghost" size="sm">Product</Button>
                 </Link>
                 
                 {/* <Link to="/logout">
