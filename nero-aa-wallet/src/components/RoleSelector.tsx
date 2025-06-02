@@ -27,10 +27,10 @@ export function RoleSelector() {
   const [walletAddressConsumer, setWalletAddressConsumer] = useState<string | null>('');
 
   const navigate = useNavigate();
-
-  const {isFarmerRole, isConsumerRole, isManufactureRole} = useRoles(walletAddress ?? ''); // Fetch roles for the given wallet address
-  
   const { AAaddress, isConnected } = useSignature();
+  const {isFarmerRole, isConsumerRole, isManufactureRole} = useRoles(AAaddress); // Fetch roles for the given wallet address
+  
+  
   const config = useConfig();
   const [isLoading, setIsLoading] = useState(false);
   const [userOpHash, setUserOpHash] = useState<string | null>('');
@@ -58,7 +58,7 @@ export function RoleSelector() {
       return;
     }
 
-    if(!isFarmerRole) {
+    if(isFarmerRole) {
       alert('You already have a Farmer role');
       return;
     }
@@ -93,7 +93,7 @@ export function RoleSelector() {
       return;
     }
 
-    if(!isConsumerRole) {
+    if(isConsumerRole) {
       alert('You already have a Consumer role');
       return;
     }
@@ -123,12 +123,14 @@ export function RoleSelector() {
     }
   }
 
+  // console.log(isFarmerRole, "isFarmerRole");
+
   const handleManufacturerRole = async () => {
     if (!isConnected) {
       alert('Please connect your wallet first');
       return;
     }
-    if(!isManufactureRole) {
+    if(isManufactureRole) {
       alert('You already have a Manufacturer role');
       return;
     }

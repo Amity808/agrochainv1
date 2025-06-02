@@ -49,13 +49,14 @@ const Home = () => {
               </h1>
               <p className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Connecting farmers directly with consumers and manufacturers on the blockchain for a more transparent and sustainable agricultural ecosystem.
+                Get Started by getting role
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/signup">
+                <Link to="/">
                   <Button size="lg">Get Started</Button>
                 </Link>
-                <Link to="/login">
-                  <Button variant="outline" size="lg">Sign In</Button>
+                <Link to="/role">
+                  <Button variant="outline" size="lg">Get Role</Button>
                 </Link>
               </div>
             </div>
