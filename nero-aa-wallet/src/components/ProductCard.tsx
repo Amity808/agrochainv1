@@ -201,13 +201,16 @@ export function ProductCard({ id }: ProductId) {
     }
   }
 
+  const ipfsUrl = productDetails?.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  console.log(productDetails?.image, "Product image");
+
   return (
     <Card className="overflow-hidden">
       <div className="aspect-video relative bg-muted">
         {productDetails?.image ? (
           <img
-            // src={productDetails?.image} 
-            src={"./image.png"}
+            src={ipfsUrl} 
+            // src={"./image.png"}
             alt={productDetails?.name}
             className="object-cover w-full h-full"
           />
