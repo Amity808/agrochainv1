@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom'; // Replace useNavigation with us
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 // import { useToast } from "../hooks/use-toast";
-import { Loader2, Sprout, ShoppingCart, Factory } from "lucide-react";
+import { Loader2, Sprout, Factory } from "lucide-react";
 import { Label } from "./ui/label";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
 import type { UserRole } from "../hooks/use-user-role";
 
-import { useSignature, useSendUserOp, useConfig } from '@/hooks';
+import { useSignature, useConfig } from '@/hooks';
 // import { ethers } from 'ethers';
 import AgroABi from "@/constants/agrochain.json";
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
@@ -22,9 +22,6 @@ import { useToast } from "@/hooks/use-toast";
 
 export function RoleSelector() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | null>('');
-  const [walletAddressManu, setWalletAddressManu] = useState<string | null>('');
-  const [walletAddressConsumer, setWalletAddressConsumer] = useState<string | null>('');
 
   const navigate = useNavigate();
   const { AAaddress, isConnected } = useSignature();
@@ -144,10 +141,10 @@ export function RoleSelector() {
       console.log(getRole, "getRole");
       toast({
         title: "Success",
-        description: `You are now registered as a Farmer on the Agrochain`,
+        description: `You are now registered as a Manufacturer on the Agrochain`,
         
       })
-      
+      alert('You are now registered as a Manufacturer on the Agrochain');
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -294,7 +291,7 @@ export function RoleSelector() {
           <Button
             type="submit"
             className="bg-green-600 hover:bg-green-700"
-            disabled={isLoading || !selectedRole || !walletAddress}
+            disabled={isLoading || !selectedRole}
           >
             {isLoading ? (
               <>
