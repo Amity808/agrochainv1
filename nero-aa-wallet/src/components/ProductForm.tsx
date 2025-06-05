@@ -78,7 +78,7 @@ export function ProductForm() {
           function: 'addProduct',
           contractAddress: contractAddressAgroChaim,
           abi: AgroABi,
-          params: [response, formData.price, formData.quantity],
+          params: [response, formData.price, formData.quantity, AAaddress],
           value: 0,
         });
   

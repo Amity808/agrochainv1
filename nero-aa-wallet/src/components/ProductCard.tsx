@@ -55,6 +55,7 @@ export function ProductCard({ id }: ProductId) {
 
 
   const USDC = "0x1dA998CfaA0C044d7205A17308B20C7de1bdCf74";
+  const USDT = "0x1dA998CfaA0C044d7205A17308B20C7de1bdCf74"
 
   const { data: agroProduct } = useReadContract({
     abi: AgroABi,
@@ -64,7 +65,6 @@ export function ProductCard({ id }: ProductId) {
   })
 
   console.log(agroProduct, "Agrochain product");
-  const wallet = getWallet(process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY);
 
 
   // const fetchProducts = async () => {
@@ -140,7 +140,7 @@ export function ProductCard({ id }: ProductId) {
         function: 'buyProduct',
         contractAddress: contractAddressAgroChaim,
         abi: AgroABi,
-        params: [id, 1, USDC],
+        params: [id, 1, USDT],
         value: 0,
       })
 
@@ -200,6 +200,8 @@ export function ProductCard({ id }: ProductId) {
       setIsLoading(false);
     }
   }
+
+  console.log(products?.seller, "Products seller");
 
   const ipfsUrl = productDetails?.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
   console.log(productDetails?.image, "Product image");
