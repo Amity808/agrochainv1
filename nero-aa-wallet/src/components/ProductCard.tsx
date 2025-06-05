@@ -282,15 +282,15 @@ export function ProductCard({ id }: ProductId) {
           </Badge>
         )}
 
-        {
-          AAaddress === products?.seller && (
+        {/* { */}
+          // AAaddress === products?.seller && (
             <>
               <UpdatePopOver id={id} />
 
               <button onClick={outOfStock}>Stock Out</button>
             </>
-          )
-        }
+          {/* // ) */}
+        {/* // } */}
 
 
 
