@@ -15,6 +15,7 @@ import { fetchIPFSData } from "@/helper/fetchIPFS";
 import { UpdatePopOver } from "./UpdatePopOver";
 import { truncateAddress } from "@/utils";
 import { getWallet } from "@/utils/getWallet";
+import { useAccount } from "wagmi";
 //0x83D6d013f11D3Ce9E2d36f20813864E861151A54
 interface ProductDescription {
   description: string;
@@ -50,6 +51,7 @@ export function ProductCard({ id }: ProductId) {
   const { toast } = useToast();
 
   const config = useConfig();
+  const { address } = useAccount();
   const { execute, waitForUserOpResult } = useSendUserOp();
   const { AAaddress } = useSignature()
 
@@ -135,7 +137,6 @@ export function ProductCard({ id }: ProductId) {
 
     setIsLoading(true);
     try {
-      // if (onPurchase) onPurchase();
       await execute({
         function: 'buyProduct',
         contractAddress: contractAddressAgroChaim,

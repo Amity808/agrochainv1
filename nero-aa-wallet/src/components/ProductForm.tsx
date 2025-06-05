@@ -8,7 +8,7 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "../hooks/use-toast";
 import { Loader2 } from "lucide-react";
-
+import { useAccount } from "wagmi";
 import { useSignature, useSendUserOp, useConfig } from '@/hooks';
 // import { ethers } from 'ethers';
 import AgroABi from "@/constants/agrochain.json";
@@ -34,6 +34,8 @@ export function ProductForm() {
   const [isPolling, setIsPolling] = useState(false);
   
   const navigate = useNavigate();
+  const { address } = useAccount();
+
   const { toast } = useToast();
 
   const handleChange = (
@@ -46,6 +48,7 @@ export function ProductForm() {
     }));
   };
 
+  console.log(address, "Address");
  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +81,7 @@ export function ProductForm() {
           function: 'addProduct',
           contractAddress: contractAddressAgroChaim,
           abi: AgroABi,
-          params: [response, formData.price, formData.quantity, AAaddress],
+          params: [response, formData.price, formData.quantity, address],
           value: 0,
         });
   
