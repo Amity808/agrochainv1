@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from 'react-router-dom'; // Replace useNavigation with useNavigate
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 // import { useToast } from "../hooks/use-toast";
-import { Loader2, Sprout, Factory } from "lucide-react";
+import { Loader2, Sprout } from "lucide-react";
 import { Label } from "./ui/label";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -63,7 +63,7 @@ export function RoleSelector() {
     
 
     try {
-      const getRole = await contractWasteInsured.grantRole(
+      const getRole = await contractWasteInsured.grantRoleFarmer(
         CONTRACT_ROLE.FARMER_ROLE, 
         AAaddress);
       console.log(getRole, "getRole");
@@ -99,7 +99,7 @@ export function RoleSelector() {
 
     try {     
 
-      const getRole = await contractWasteInsured.grantRole(
+      const getRole = await contractWasteInsured.grantRoleFarmer(
         CONTRACT_ROLE.CONSUMER_ROLE, 
         AAaddress);
       console.log(getRole, "getRole");
@@ -135,7 +135,7 @@ export function RoleSelector() {
 
     try {
 
-      const getRole = await contractWasteInsured.grantRole(
+      const getRole = await contractWasteInsured.grantRoleFarmer(
         CONTRACT_ROLE.CONSUMER_ROLE, 
         AAaddress);
       console.log(getRole, "getRole");
@@ -149,7 +149,7 @@ export function RoleSelector() {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to select role.",
+        description: "Failed to select role, or already has role",
         variant: "destructive", 
       });
     } finally {

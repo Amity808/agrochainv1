@@ -263,7 +263,7 @@ export function ProductCard({ id }: ProductId) {
         <Button
           onClick={handlePurchase}
           disabled={isLoading}
-          className="w-full"
+          className=" w-min"
         >
           {isLoading ? (
             <>
@@ -282,14 +282,13 @@ export function ProductCard({ id }: ProductId) {
           </Badge>
         )}
 
-        {/* { */}
-          {/* // AAaddress === products?.seller && ( */}
+        {
+          AAaddress === products?.seller && (
             <>
               <UpdatePopOver id={id} />
-
-              <button onClick={outOfStock}>Stock Out</button>
+              <Button className=" w-min" onClick={outOfStock}>Stock Out</Button>
             </>
-          {/* // ) */}
+           )}
         {/* // } */}
 
 

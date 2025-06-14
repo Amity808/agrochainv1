@@ -7,12 +7,14 @@ import { Leaf } from "lucide-react";
 // import { useAccount } from "wagmi";
 import { useSignature } from "@/hooks";
 import { truncateAddress } from "@/utils";
+import { useRoles } from "@/hooks/useRole";
 
 //  TODO: create a hook to manage the roles selection 
 export function Header() {
 
   // const { address } = useAccount();
   const { AAaddress } = useSignature();
+  const { isFarmerRole } = useRoles(AAaddress) as { isFarmerRole: boolean };
 
   return (
     <header className="border-b bg-white dark:bg-gray-950 dark:text-white">
@@ -33,12 +35,13 @@ export function Header() {
                   {truncateAddress(AAaddress)}
                 </span>
                 
-                {/* {userRole === "farmer" && ( */}
+                {isFarmerRole && (
                   <Link to="/add-product">
                     <Button variant="outline" size="sm" className="hidden md:inline-flex">
                       Add Product
                     </Button>
                   </Link>
+                )}
               
                 
                 {/* {!AAaddress && (

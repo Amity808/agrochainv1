@@ -4,4 +4,4 @@ export const CONTRACT_ROLE = {
     MANUFACTURE_ROLE: '0xeefb95e842a3287179d933b4460be539a1d5af11aa8b325bb45c5c8dc92de4ed',
 }
 
-export const contractAddressAgroChaim = "0x6008C7BF5F99A446120AF364561663eD702B1C83"
+export const contractAddressAgroChaim = "0x14713794B5164277ACDB4879D9B3066C8E6Ca0be"
