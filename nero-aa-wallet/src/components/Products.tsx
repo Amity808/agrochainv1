@@ -3,11 +3,18 @@ import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { useReadContract } from "wagmi";
 import { ProductCard } from "@/components/ProductCard";
+import ProductFliter from "@/components/ProductFliter";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 // import { Loader}
 
 const Products = () => {
 
     const [productLen, setProductLen] = useState<Map<string, string>>(new Map());
+
+    const [searchQuery, setSearchQuery] = useState("")
+    const [sortBy, setSortBy] = useState("newest");
+
 
     const { data: agroProduct } = useReadContract({
         abi: AgroABi,
@@ -43,12 +50,35 @@ const Products = () => {
         getProductLen()
       }, [agroProduct, getProductLen])
 
+      const handleSearch = (query: string) => {
+        setSearchQuery(query)
+      }
+
 
   return (
+
+    <div>
+
+    <ProductFliter onSearch={handleSearch} />
+    <div className="w-full md:w-48">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
          {[...productLen.entries()].map(([key, value]) => (
-        <ProductCard id={value} key={key} />
+        <ProductCard id={value} key={key} searchQuery={searchQuery} />
       ))}
+    </div>
     </div>
   )
 }

@@ -2,21 +2,25 @@ import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { Schema } from "@/libs/db-types";
 import Products from "@/components/Products";
-import { useUserRole } from "@/hooks/use-user-role";
+// import { useUserRole } from "@/hooks/use-user-role";
+import { useRoles } from "@/hooks/useRole";
+import { useSignature } from "@/hooks";
 
 
 
 const ProductsPage = () => {
   // const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
+  // const [searchTerm, setSearchTerm] = useState("");
+  // const [sortBy, setSortBy] = useState("newest");
+  const { AAaddress } = useSignature();
+  const { isFarmerRole } = useRoles(AAaddress) as { isFarmerRole: boolean }
+
  
-  const { userRole } = useUserRole();
+  
   
   return (
     <main className="w-full min-h-screen flex flex-col bg-background text-foreground">
@@ -31,7 +35,7 @@ const ProductsPage = () => {
             </p>
           </div>
           
-          {userRole === "farmer" && (
+          {isFarmerRole && (
             <Link to="/products/add">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -42,7 +46,7 @@ const ProductsPage = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
+          {/* <div className="flex-1">
             <Input
               placeholder="Search products..."
               value={searchTerm}
@@ -50,8 +54,8 @@ const ProductsPage = () => {
               className="w-full"
             />
           </div>
-          
-          <div className="w-full md:w-48">
+           */}
+          {/* <div className="w-full md:w-48">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
                 <SelectValue placeholder="Sort by" />
@@ -63,7 +67,7 @@ const ProductsPage = () => {
                 <SelectItem value="price-high">Price: High to Low</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
         </div>
         
         

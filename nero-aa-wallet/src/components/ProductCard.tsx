@@ -37,9 +37,10 @@ interface ProductData {
 }
 interface ProductId {
   id: string;
+  searchQuery: string;
 }
 
-export function ProductCard({ id }: ProductId) {
+export function ProductCard({ id, searchQuery }: ProductId) {
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<ProductData | null>(null);
   const [quantity, setQuantity] = useState("")
@@ -206,6 +207,15 @@ export function ProductCard({ id }: ProductId) {
 
   const ipfsUrl = productDetails?.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
   console.log(productDetails?.image, "Product image");
+
+  if (
+    searchQuery != "" &&
+    !productDetails?.name
+      .toLocaleLowerCase()
+      .includes(searchQuery.toLocaleLowerCase().trim())
+  ) {
+    return null;
+  }
 
   return (
     <Card className="overflow-hidden">
