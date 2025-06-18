@@ -33,8 +33,8 @@ const Products = () => {
           }
     
           const newMap = new Map<string, string>();
-          if (typeof agroProduct === 'bigint' && agroProduct > 0) {
-            for (let i = 0; i < agroProduct; i++) {
+          if (typeof agroProduct === 'bigint' && agroProduct > 1) {
+            for (let i = 1; i < agroProduct; i++) {
               newMap.set(i.toString(), i.toString()); 
             }
             setProductLen(new Map(newMap));

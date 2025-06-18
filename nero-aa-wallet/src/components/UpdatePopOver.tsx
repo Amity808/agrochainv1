@@ -11,21 +11,24 @@ import { useSendUserOp, useSignature } from "@/hooks";
 import { useToast } from "../hooks/use-toast";
 import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
+
 interface ProductIds {
-    id: string;
+  id: string;
 }
 
-export function UpdatePopOver({id }: ProductIds) {
-    const [quantity, setQuantity] = useState("")
-    const [txStatus, setTxStatus] = useState('');
-    const [isPolling, setIsPolling] = useState(false);
-    const [userOpHash, setUserOpHash] = useState<string | null>('');
-    const [isLoading, setIsLoading] = useState(false);
+export function UpdatePopOver({ id }: ProductIds) {
+  const [quantity, setQuantity] = useState("1")
+  const [txStatus, setTxStatus] = useState('');
+  const [isPolling, setIsPolling] = useState(false);
+  const [userOpHash, setUserOpHash] = useState<string | null>('');
+  const [isLoading, setIsLoading] = useState(false);
 
 
-    const { execute, waitForUserOpResult } = useSendUserOp();
-//   const { AAaddress } = useSignature()
+  const { execute, waitForUserOpResult } = useSendUserOp();
+  //   const { AAaddress } = useSignature()
   const { toast } = useToast();
+
+  console.log(id)
 
 
   const handleUpdate = async () => {
@@ -39,6 +42,8 @@ export function UpdatePopOver({id }: ProductIds) {
         params: [id, quantity],
         value: 0,
       })
+
+      
 
       const result = await waitForUserOpResult();
       setUserOpHash(result?.userOpHash);
@@ -57,6 +62,7 @@ export function UpdatePopOver({id }: ProductIds) {
         description: "There was an error updating your product.",
         variant: "destructive",
       });
+      console.log(error)
     } finally {
       setIsLoading(false);
     }
@@ -65,14 +71,14 @@ export function UpdatePopOver({id }: ProductIds) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full">Update Product</Button>
+        <Button variant="outline" size={"sm"} className="w-full">Update Product</Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80 bg-white dark:bg-gray-950 z-50 shadow-lg">
         <div className="grid gap-4">
           <div className="space-y-2">
             {/* <h4 className="font-medium leading-none">Update Product quality</h4> */}
             <p className="text-sm text-muted-foreground">
-            Update Product Quality
+              Update Product Quality
             </p>
           </div>
           <div className="grid gap-2">
@@ -86,7 +92,7 @@ export function UpdatePopOver({id }: ProductIds) {
                 className="col-span-2 h-8"
               />
             </div>
-            <button onClick={handleUpdate}>Update</button>
+            <Button size={"sm"} variant={"outline"} type="button" onClick={handleUpdate}>Update</Button>
           </div>
         </div>
       </PopoverContent>

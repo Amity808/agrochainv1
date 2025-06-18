@@ -27,6 +27,9 @@ export function ProductForm() {
   });
 
   const { AAaddress, isConnected } = useSignature();
+
+  console.log(AAaddress, "AAaddress");
+  const { address } = useAccount();
   const { execute, waitForUserOpResult } = useSendUserOp();
   const config = useConfig();
   const [userOpHash, setUserOpHash] = useState<string | null>('');
@@ -34,7 +37,7 @@ export function ProductForm() {
   const [isPolling, setIsPolling] = useState(false);
   
   const navigate = useNavigate();
-  const { address } = useAccount();
+  
 
   const { toast } = useToast();
 
@@ -48,7 +51,6 @@ export function ProductForm() {
     }));
   };
 
-  console.log(address, "Address");
  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +83,7 @@ export function ProductForm() {
           function: 'addProduct',
           contractAddress: contractAddressAgroChaim,
           abi: AgroABi,
-          params: [response, formData.price, formData.quantity, address],
+          params: [response, formData.price, formData.quantity, AAaddress],
           value: 0,
         });
   

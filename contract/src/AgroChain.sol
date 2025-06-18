@@ -45,7 +45,9 @@ contract AgroChain is AccessControl {
     // mapping (address => bool) public  consumerRole;
     // mapping (address => bool) public manufacturerRole;
     mapping(uint => Order) public orders;
+    mapping(address => uint) public itemsSoldByFarmer;
 
+    event ItemsSoldUpdated(address farmer, uint itemsSold);
     event ProductAdded(uint productId, string name, address seller);
     event OrderPlaced(uint orderId, uint productId, address buyer);
     event OrderStatusUpdated(uint orderId, Status status);
@@ -168,6 +170,10 @@ contract AgroChain is AccessControl {
         }
 
         product.quantity -= _quantity;
+        
+        itemsSoldByFarmer[product.seller] += _quantity;
+        emit ItemsSoldUpdated(product.seller, itemsSoldByFarmer[product.seller]);
+
 
         orderCount++;
         orders[orderCount] = Order({

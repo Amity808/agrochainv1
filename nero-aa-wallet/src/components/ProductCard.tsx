@@ -273,7 +273,7 @@ export function ProductCard({ id, searchQuery }: ProductId) {
         <Button
           onClick={handlePurchase}
           disabled={isLoading}
-          className=" w-min"
+          className=" w-min text-white"
         >
           {isLoading ? (
             <>
@@ -286,17 +286,17 @@ export function ProductCard({ id, searchQuery }: ProductId) {
         </Button>
 
 
-        {products?.quantity != 0 && (
+        {products?.quantity == 0 && (
           <Badge variant="secondary" className="w-full flex justify-center py-1">
             Sold Out
           </Badge>
         )}
 
         {
-          AAaddress === products?.seller && (
+          address === products?.seller && (
             <>
               <UpdatePopOver id={id} />
-              <Button className=" w-min" onClick={outOfStock}>Stock Out</Button>
+              <Button className=" w-min text-white" onClick={outOfStock}>Stock Out</Button>
             </>
            )}
         {/* // } */}
@@ -304,6 +304,7 @@ export function ProductCard({ id, searchQuery }: ProductId) {
 
 
       </CardFooter>
+      
     </Card>
   );
 }

@@ -14,7 +14,8 @@ export function Header() {
 
   // const { address } = useAccount();
   const { AAaddress } = useSignature();
-  const { isFarmerRole } = useRoles(AAaddress) as { isFarmerRole: boolean };
+  const { isFarmerRole } = useRoles(AAaddress);
+  console.log(isFarmerRole, "isFarmerRole");
 
   return (
     <header className="border-b bg-white dark:bg-gray-950 dark:text-white">
@@ -35,7 +36,7 @@ export function Header() {
                   {truncateAddress(AAaddress)}
                 </span>
                 
-                {isFarmerRole && (
+                {Boolean(isFarmerRole) && (
                   <Link to="/add-product">
                     <Button variant="outline" size="sm" className="hidden md:inline-flex">
                       Add Product

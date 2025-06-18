@@ -23,6 +23,7 @@ import '@/index.css'
 // import { Web3AuthProvider } from "@web3auth/modal/react";
 // import web3AuthContextConfig from './contexts/Web3AuthContext'
 import { WalletConfig } from '@/types'
+import { ToastProvider } from './components/ui/toast'
 
 interface SocialWalletProps {
   config: WalletConfig
@@ -55,10 +56,14 @@ export const SocialWallet: React.FC<SocialWalletProps> = ({
                           <ClientProvider>
                             <SendUserOpProvider>
                               <TransactionProvider>
+                                <ToastProvider>
+                              
                                 {children}
                                 <div style={{ position: 'relative', zIndex: zIndex }}>
                                   <App mode={mode} />
                                 </div>
+                                
+                                </ToastProvider>
                               </TransactionProvider>
                             </SendUserOpProvider>
                           </ClientProvider>
