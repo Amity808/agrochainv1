@@ -37,6 +37,9 @@ export function ProductForm() {
   const [isPolling, setIsPolling] = useState(false);
   
   const navigate = useNavigate();
+
+  const USDT = "0x1dA998CfaA0C044d7205A17308B20C7de1bdCf74"
+
   
 
   const { toast } = useToast();
@@ -63,9 +66,7 @@ export function ProductForm() {
     setUserOpHash(null);
     setTxStatus('');
 
-    
 
-    
 
     try {
 
@@ -83,7 +84,7 @@ export function ProductForm() {
           function: 'addProduct',
           contractAddress: contractAddressAgroChaim,
           abi: AgroABi,
-          params: [response, formData.price, formData.quantity, AAaddress],
+          params: [response, formData.price, formData.quantity, AAaddress, USDT],
           value: 0,
         });
   
@@ -223,7 +224,7 @@ export function ProductForm() {
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => navigate("/products")}
+            onClick={() => navigate("/product")}
             disabled={isLoading}
           >
             Cancel

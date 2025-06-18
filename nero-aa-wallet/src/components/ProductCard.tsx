@@ -293,10 +293,15 @@ export function ProductCard({ id, searchQuery }: ProductId) {
         )}
 
         {
-          address === products?.seller && (
+          AAaddress === products?.seller && (
             <>
               <UpdatePopOver id={id} />
+              { products?.quantity == 0 ? (<>
+              
+              </>) : <>
               <Button className=" w-min text-white" onClick={outOfStock}>Stock Out</Button>
+
+              </>}
             </>
            )}
         {/* // } */}
@@ -304,7 +309,7 @@ export function ProductCard({ id, searchQuery }: ProductId) {
 
 
       </CardFooter>
-      
+
     </Card>
   );
 }

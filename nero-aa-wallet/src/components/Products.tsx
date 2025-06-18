@@ -60,7 +60,7 @@ const Products = () => {
     <div>
 
     <ProductFliter onSearch={handleSearch} />
-    <div className="w-full md:w-48">
+    {/* <div className="w-full md:w-48">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
                 <SelectValue placeholder="Sort by" />
@@ -72,7 +72,7 @@ const Products = () => {
                 <SelectItem value="price-high">Price: High to Low</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
          {[...productLen.entries()].map(([key, value]) => (

@@ -36,7 +36,7 @@ const ProductsPage = () => {
           </div>
           
           {isFarmerRole && (
-            <Link to="/products/add">
+            <Link to="/add-product">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product
