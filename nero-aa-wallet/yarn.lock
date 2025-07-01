@@ -9719,6 +9719,7 @@ __metadata:
     react-hook-form: ^7.56.4
     react-icons: ^5.2.1
     react-router-dom: ^7.6.1
+    react-toastify: ^11.0.5
     storybook: ^8.1.11
     swr: ^2.2.5
     tailwind-merge: ^3.3.0
@@ -10994,6 +10995,18 @@ __metadata:
     "@types/react":
       optional: true
   checksum: a7b0bf493c9231065ebafa84c4237aed997c746c561196121b7de82fe155a5355b372db5070a3ac9fe980cf7f60dc0f1e8cf6402a2aa5b2957392932ccf76e76
+  languageName: node
+  linkType: hard
+
+"react-toastify@npm:^11.0.5":
+  version: 11.0.5
+  resolution: "react-toastify@npm:11.0.5"
+  dependencies:
+    clsx: ^2.1.1
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  checksum: e2150aabe6a2b70d1d06bd6d4ef14d14e7ff38703980339660a34ef2251df206c4850dbf52a483aacf22265b41a8af0e27210ce20bf10ea7df4600e492a58352
   languageName: node
   linkType: hard
 

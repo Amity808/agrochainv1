@@ -18,7 +18,8 @@ import { getWallet } from "@/utils/getWallet";
 import { ethers } from "ethers";
 // import { toast } from "@/hooks/use-toast";
 import { useRoles } from "@/hooks/useRole";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
+// import { Toast } from "./ui/toast";
 
 export function RoleSelector() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -35,7 +36,8 @@ export function RoleSelector() {
   const [isPolling, setIsPolling] = useState(false);
   const {address }  = useAccount()
 
-  const { toast } = useToast();
+  // const { toast } = useToast();
+
 
   const wallet = getWallet(import.meta.env.VITE_SIGN_URL);
 
@@ -63,22 +65,18 @@ export function RoleSelector() {
     
 
     try {
-      const getRole = await contractWasteInsured.grantRoleFarmer(
+      const getRole = await contractWasteInsured.grantRole(
         CONTRACT_ROLE.FARMER_ROLE, 
         AAaddress);
-      console.log(getRole, "getRole");
-      toast({
-        title: "Success",
-        description: `You are now registered as a Farmer on the Agrochain`,
-        
-      })
+        await contractWasteInsured.grantRole(
+          CONTRACT_ROLE.FARMER_ROLE, 
+          address);
+      // console.log(getRole, "getRole");
+      toast.success("You are now registered as a Farmer on the Agrochain")
+      navigate("/product")
     } catch (error) {
       console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to get role.",
-        variant: "destructive", // Use "destructive" for errors
-      });
+      toast.error("Failed to get role.")
     } finally {
       setIsLoading(false);
     }
@@ -91,30 +89,28 @@ export function RoleSelector() {
     }
 
     if(isConsumerRole) {
-      alert('You already have a Consumer role');
+      toast.error('You already have a Consumer role');
       return;
     }
+    console.log("consmer", isConsumerRole)
     setIsLoading(true);
     
 
     try {     
 
-      const getRole = await contractWasteInsured.grantRoleFarmer(
+      const getRole = await contractWasteInsured.grantRole(
         CONTRACT_ROLE.CONSUMER_ROLE, 
         AAaddress);
-      console.log(getRole, "getRole");
-      toast({
-        title: "Success",
-        description: `You are now registered as a Farmer on the Agrochain`,
-        
-      })
+        await contractWasteInsured.grantRole(
+          CONTRACT_ROLE.CONSUMER_ROLE, 
+          address);
+      // console.log(getRole, "getRole");
+      toast.success("Succesfully got role")
+      navigate("/product")
+
     } catch (error) {
       console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to select role.",
-        variant: "destructive", 
-      });
+      toast.error("Failed to get role.")
     } finally {
       setIsLoading(false);
     }
@@ -135,23 +131,21 @@ export function RoleSelector() {
 
     try {
 
-      const getRole = await contractWasteInsured.grantRoleFarmer(
-        CONTRACT_ROLE.CONSUMER_ROLE, 
+      const getRole = await contractWasteInsured.grantRole(
+        CONTRACT_ROLE.MANUFACTURE_ROLE, 
         AAaddress);
-      console.log(getRole, "getRole");
-      toast({
-        title: "Success",
-        description: `You are now registered as a Manufacturer on the Agrochain`,
         
-      })
-      alert('You are now registered as a Manufacturer on the Agrochain');
+        await contractWasteInsured.grantRole(
+          CONTRACT_ROLE.MANUFACTURE_ROLE, 
+          address);
+          
+      // console.log(getRole, "getRole");
+      toast.success("You are now registered as a Manufacturer on the Agrochain");
+      navigate("/product")
+      // alert('You are now registered as a Manufacturer on the Agrochain');
     } catch (error) {
       console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to select role, or already has role",
-        variant: "destructive", 
-      });
+      toast.error("Failed to get role.")
     } finally {
       setIsLoading(false);
     }

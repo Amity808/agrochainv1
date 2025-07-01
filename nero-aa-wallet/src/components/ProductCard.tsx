@@ -1,21 +1,24 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-// import { UserRoleBadge } from "./UserRoleBadge";
-// import { TransactionStatus } from "./TransactionStatus";
 import { useState, useCallback, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { useToast } from "../hooks/use-toast";
 import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { useReadContract } from "wagmi";
+import { parseGwei } from "viem";
 // import { ethers } from "ethers";
 import { useConfig, useSendUserOp, useSignature } from "@/hooks";
 import { fetchIPFSData } from "@/helper/fetchIPFS";
 import { UpdatePopOver } from "./UpdatePopOver";
 import { truncateAddress } from "@/utils";
 import { getWallet } from "@/utils/getWallet";
+import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
+import { useWriteContract  } from "wagmi";
+import { ethers } from "ethers";
+import { ERC20_ABI } from "@/constants/abi";
+// import { executeBath}
 //0x83D6d013f11D3Ce9E2d36f20813864E861151A54
 interface ProductDescription {
   description: string;
@@ -49,12 +52,15 @@ export function ProductCard({ id, searchQuery }: ProductId) {
   const [userOpHash, setUserOpHash] = useState<string | null>('');
 
   const [productDetails, setProductDetails] = useState<ProductDescription | null>(null);
-  const { toast } = useToast();
+  // const { toast } = useToast();
+
+  const { writeContractAsync } = useWriteContract();
 
   const config = useConfig();
   const { address } = useAccount();
-  const { execute, waitForUserOpResult } = useSendUserOp();
+  const { execute, waitForUserOpResult, executeBatch } = useSendUserOp();
   const { AAaddress } = useSignature()
+  console.log("ad", address)
 
 
   const USDC = "0x1dA998CfaA0C044d7205A17308B20C7de1bdCf74";
@@ -132,37 +138,67 @@ export function ProductCard({ id, searchQuery }: ProductId) {
 
   console.log(products?.url, "Products");
 
+  // const total = quantity * products?.price
 
 
   const handlePurchase = async () => {
 
     setIsLoading(true);
+
+
     try {
-      await execute({
-        function: 'buyProduct',
-        contractAddress: contractAddressAgroChaim,
-        abi: AgroABi,
-        params: [id, 1, USDT],
-        value: 0,
-      })
 
-      const result = await waitForUserOpResult();
-      setUserOpHash(result?.userOpHash);
+      // await writeContractAsync({
+      //   address: contractAddressAgroChaim,
+      //   abi: AgroABi,
+      //   functionName: "buyProduct",
+      //   args: [id, 1, USDT],
+      //   account: address,
+      // maxPriorityFeePerGas: parseGwei('1'),
+      // })
+
+      const price = products?.price.toString()
+
+      const parsedAmount = ethers.utils.parseUnits(price || '0', 18);
+      
+        
+      const batchOperations = [
+        {
+          function: 'approve',
+          contractAddress: USDT,
+          abi: ERC20_ABI,
+          params: [contractAddressAgroChaim, parsedAmount],
+          value: 0,
+        },
+        {
+          function: 'buyProduct',
+          contractAddress: contractAddressAgroChaim,
+          abi: AgroABi,
+          params: [id, 1, USDT],
+          value: 0,
+        }
+      ];
+
+
+      const batchResult = await executeBatch(batchOperations);
+
+      const batchConfirmation = await waitForUserOpResult();
+      setUserOpHash(batchConfirmation?.userOpHash);
       setIsPolling(true);
-      console.log(result)
-      if (result.result === true) {
-        setTxStatus('Success!');
-        setIsPolling(false);
-      } else if (result.transactionHash) {
-        setTxStatus('Transaction hash: ' + result.transactionHash);
-      }
+      console.log('Batch confirmation:', batchConfirmation);
 
+      if (batchConfirmation && batchConfirmation.result === true) {
+        setTxStatus('Payment successful!');
+        setIsPolling(false);
+      } else if (batchConfirmation && batchConfirmation.transactionHash) {
+        setTxStatus('Transaction hash: ' + batchConfirmation.transactionHash);
+      } else {
+        setTxStatus('Payment transaction failed or timed out');
+        setIsPolling(false);
+      }
     } catch (error) {
-      toast({
-        title: "Purchase failed",
-        description: "There was an error processing your purchase.",
-        variant: "destructive",
-      });
+      console.log(error)
+      toast("There was an error processing your purchase.Kindly get a role or check your balance");
     } finally {
       setIsLoading(false);
     }
@@ -187,17 +223,14 @@ export function ProductCard({ id, searchQuery }: ProductId) {
       console.log(result)
       if (result.result === true) {
         setTxStatus('Success!');
+        toast.success("Product is out of stock")
         setIsPolling(false);
       } else if (result.transactionHash) {
         setTxStatus('Transaction hash: ' + result.transactionHash);
       }
 
     } catch (error) {
-      toast({
-        title: "Purchase failed",
-        description: "There was an error processing.",
-        variant: "destructive",
-      });
+      toast("There was an error processing.");
     } finally {
       setIsLoading(false);
     }

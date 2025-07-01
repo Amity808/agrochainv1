@@ -11,7 +11,7 @@ import { useSendUserOp, useSignature } from "@/hooks";
 import { useToast } from "../hooks/use-toast";
 import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
-
+import { toast } from "react-toastify"
 interface ProductIds {
   id: string;
 }
@@ -26,7 +26,7 @@ export function UpdatePopOver({ id }: ProductIds) {
 
   const { execute, waitForUserOpResult } = useSendUserOp();
   //   const { AAaddress } = useSignature()
-  const { toast } = useToast();
+  // const { toast } = useToast();
 
   console.log(id)
 
@@ -51,17 +51,14 @@ export function UpdatePopOver({ id }: ProductIds) {
       console.log(result)
       if (result.result === true) {
         setTxStatus('Success!');
+        toast.success("Quanity updated successfully")
         setIsPolling(false);
       } else if (result.transactionHash) {
         setTxStatus('Transaction hash: ' + result.transactionHash);
       }
 
     } catch (error) {
-      toast({
-        title: "Product Update failed",
-        description: "There was an error updating your product.",
-        variant: "destructive",
-      });
+      toast.error("There was an error updating your product.")
       console.log(error)
     } finally {
       setIsLoading(false);

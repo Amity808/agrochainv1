@@ -17,9 +17,12 @@ import {
   TransactionProvider,
   WrapWagmiProvider,
 } from '@/contexts'
+import { ToastContainer } from 'react-toastify';
 import { useSignature, useAAtransfer, useSendUserOp, useConfig } from '@/hooks'
 import '@rainbow-me/rainbowkit/styles.css'
 import '@/index.css'
+import "react-toastify/dist/ReactToastify.css";
+
 // import { Web3AuthProvider } from "@web3auth/modal/react";
 // import web3AuthContextConfig from './contexts/Web3AuthContext'
 import { WalletConfig } from '@/types'
@@ -57,12 +60,24 @@ export const SocialWallet: React.FC<SocialWalletProps> = ({
                             <SendUserOpProvider>
                               <TransactionProvider>
                                 <ToastProvider>
-                              
-                                {children}
-                                <div style={{ position: 'relative', zIndex: zIndex }}>
-                                  <App mode={mode} />
-                                </div>
-                                
+                                  <ToastContainer
+                                    position="top-center"
+                                    autoClose={5000}
+                                    hideProgressBar={false}
+                                    newestOnTop={false}
+                                    closeOnClick
+                                    rtl={false}
+                                    pauseOnFocusLoss
+                                    draggable
+                                    pauseOnHover
+                                    theme="light"
+                                  />
+
+                                  {children}
+                                  <div style={{ position: 'relative', zIndex: zIndex }}>
+                                    <App mode={mode} />
+                                  </div>
+
                                 </ToastProvider>
                               </TransactionProvider>
                             </SendUserOpProvider>

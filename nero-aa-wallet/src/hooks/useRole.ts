@@ -7,23 +7,23 @@ export const useRoles = (address: string) => {
     const { data: isFarmerRole, isLoading: isFarmerLoading, error: farmerError } = useReadContract({
         address: contractAddressAgroChaim,
         abi: AgroABi,
-        functionName: 'accountRoles',
-        // args: [CONTRACT_ROLE.FARMER_ROLE, address],
-        args: [address],
+        functionName: 'hasRole',
+        args: [CONTRACT_ROLE.FARMER_ROLE, address],
+        // args: [address],
     })
 
     const { data: isConsumerRole, isLoading: isConsumerLoading, error: consumerError } = useReadContract({
         address: contractAddressAgroChaim,
         abi: AgroABi,
-        functionName: 'accountRoles',
-        // args: [CONTRACT_ROLE.CONSUMER_ROLE, address],
-        args: [address],
+        functionName: 'hasRole',
+        args: [CONTRACT_ROLE.CONSUMER_ROLE, address],
+        // args: [address],
     });
     const { data: isManufactureRole, isLoading: isManufactureLoading, error: manufactureError } = useReadContract({
         address: contractAddressAgroChaim,
         abi: AgroABi,
-        functionName: 'accountRoles',
-        args: [address],
+        functionName: 'hasRole',
+        args: [CONTRACT_ROLE.MANUFACTURE_ROLE,address],
     });
 
     

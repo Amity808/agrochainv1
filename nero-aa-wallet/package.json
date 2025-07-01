@@ -63,6 +63,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.56.4",
     "react-router-dom": "^7.6.1",
+    "react-toastify": "^11.0.5",
     "swr": "^2.2.5",
     "tailwind-merge": "^3.3.0",
     "userop": "https://github.com/nerochain/aa-userop-sdk.git#d33bde2ba69044a367464e8f00fe0c5839e640b3",
