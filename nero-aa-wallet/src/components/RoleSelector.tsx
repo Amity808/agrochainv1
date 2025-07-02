@@ -2,24 +2,19 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom'; // Replace useNavigation with useNavigate
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
-// import { useToast } from "../hooks/use-toast";
 import { Loader2, Sprout } from "lucide-react";
 import { Label } from "./ui/label";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
 import type { UserRole } from "../hooks/use-user-role";
-
-import { useSignature, useConfig } from '@/hooks';
-// import { ethers } from 'ethers';
+import { useSignature } from '@/hooks';
 import AgroABi from "@/constants/agrochain.json";
 import { CONTRACT_ROLE, contractAddressAgroChaim } from "@/constants/contractRole";
 import { useAccount } from "wagmi";
 import { getWallet } from "@/utils/getWallet";
 import { ethers } from "ethers";
-// import { toast } from "@/hooks/use-toast";
 import { useRoles } from "@/hooks/useRole";
 import { toast } from "react-toastify";
-// import { Toast } from "./ui/toast";
 
 export function RoleSelector() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -29,7 +24,6 @@ export function RoleSelector() {
   const {isFarmerRole, isConsumerRole, isManufactureRole} = useRoles(AAaddress); 
   
   
-  const config = useConfig();
   const [isLoading, setIsLoading] = useState(false);
   const {address }  = useAccount()
 
