@@ -147,9 +147,9 @@ export function ProductCard({ id, searchQuery }: ProductId) {
 
       const price = products?.price.toString()
 
-      const parsedAmount = ethers.utils.parseUnits(price || '0', 18);
+      const parsedAmount = ethers.utils.parseEther(price || '0');
       
-        
+    
       const batchOperations = [
         {
           function: 'approve',
