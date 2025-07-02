@@ -26,14 +26,11 @@ export function RoleSelector() {
 
   const navigate = useNavigate();
   const { AAaddress, isConnected } = useSignature();
-  const {isFarmerRole, isConsumerRole, isManufactureRole} = useRoles(AAaddress); // Fetch roles for the given wallet address
+  const {isFarmerRole, isConsumerRole, isManufactureRole} = useRoles(AAaddress); 
   
   
   const config = useConfig();
   const [isLoading, setIsLoading] = useState(false);
-  const [userOpHash, setUserOpHash] = useState<string | null>('');
-  const [txStatus, setTxStatus] = useState('');
-  const [isPolling, setIsPolling] = useState(false);
   const {address }  = useAccount()
 
   // const { toast } = useToast();
@@ -73,7 +70,7 @@ export function RoleSelector() {
           address);
       // console.log(getRole, "getRole");
       toast.success("You are now registered as a Farmer on the Agrochain")
-      navigate("/product")
+      navigate("/add-product")
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to get role.")
