@@ -6,13 +6,10 @@ import { Loader2 } from "lucide-react";
 import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { useReadContract } from "wagmi";
-import { parseGwei } from "viem";
-// import { ethers } from "ethers";
 import { useConfig, useSendUserOp, useSignature } from "@/hooks";
 import { fetchIPFSData } from "@/helper/fetchIPFS";
 import { UpdatePopOver } from "./UpdatePopOver";
 import { truncateAddress } from "@/utils";
-import { getWallet } from "@/utils/getWallet";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 import { useWriteContract  } from "wagmi";
@@ -147,15 +144,6 @@ export function ProductCard({ id, searchQuery }: ProductId) {
 
 
     try {
-
-      // await writeContractAsync({
-      //   address: contractAddressAgroChaim,
-      //   abi: AgroABi,
-      //   functionName: "buyProduct",
-      //   args: [id, 1, USDT],
-      //   account: address,
-      // maxPriorityFeePerGas: parseGwei('1'),
-      // })
 
       const price = products?.price.toString()
 
