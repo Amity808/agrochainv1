@@ -6,16 +6,14 @@ import { Loader2 } from "lucide-react";
 import AgroABi from "@/constants/agrochain.json";
 import { contractAddressAgroChaim } from "@/constants/contractRole";
 import { useReadContract } from "wagmi";
-import { useConfig, useSendUserOp, useSignature } from "@/hooks";
+import {  useSendUserOp, useSignature } from "@/hooks";
 import { fetchIPFSData } from "@/helper/fetchIPFS";
 import { UpdatePopOver } from "./UpdatePopOver";
 import { truncateAddress } from "@/utils";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
-import { useWriteContract  } from "wagmi";
 import { ethers } from "ethers";
 import { ERC20_ABI } from "@/constants/abi";
-// import { executeBath}
 //0x83D6d013f11D3Ce9E2d36f20813864E861151A54
 interface ProductDescription {
   description: string;
@@ -51,9 +49,7 @@ export function ProductCard({ id, searchQuery }: ProductId) {
   const [productDetails, setProductDetails] = useState<ProductDescription | null>(null);
   // const { toast } = useToast();
 
-  const { writeContractAsync } = useWriteContract();
 
-  const config = useConfig();
   const { address } = useAccount();
   const { execute, waitForUserOpResult, executeBatch } = useSendUserOp();
   const { AAaddress } = useSignature()
